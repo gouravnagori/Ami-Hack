@@ -38,7 +38,7 @@
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
   gap: 48px;
-  align-items: center;
+  align-items: start;
 }
 
 .heroCopy {
@@ -201,66 +201,140 @@
 }
 
 /* Right visual */
+/* Right visual container */
 .heroVisual {
-  min-height: 520px;
+  height: 560px;
   position: relative;
   perspective: 1200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  z-index: 2;
+  margin-top: 8px;
 }
 
 .backShape {
   position: absolute;
-  right: 0;
-  top: 30px;
-  width: 440px;
-  height: 440px;
+  right: -10px;
+  top: 25px;
+  width: 460px;
+  height: 460px;
   border-radius: 48% 52% 49% 51%;
   background: var(--cream);
-  transform: rotate(12deg);
+  transform: rotate(13deg);
   animation: shapeBreath 12s ease-in-out infinite alternate;
+  pointer-events: none;
 }
 
 .sceneGrid {
   position: absolute;
-  right: -10px;
-  top: 10px;
-  width: 460px;
-  height: 450px;
+  right: -25px;
+  top: 6px;
+  width: 480px;
+  height: 470px;
   opacity: 0.35;
   background-image: linear-gradient(#173d2a12 1px, transparent 1px),
     linear-gradient(90deg, #173d2a12 1px, transparent 1px);
   background-size: 34px 34px;
   mask-image: radial-gradient(circle, #000 15%, transparent 72%);
   -webkit-mask-image: radial-gradient(circle, #000 15%, transparent 72%);
-  transform: rotate(-6deg);
+  transform: rotate(-8deg);
   pointer-events: none;
 }
 
+.signalLine {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.signalLine path {
+  fill: none;
+  stroke: #69a83f;
+  stroke-width: 1.5;
+  stroke-dasharray: 6 8;
+  opacity: 0.55;
+}
+
+.signalNode {
+  fill: var(--green);
+  animation: nodePulse 2.5s ease-in-out infinite;
+}
+
+@keyframes nodePulse {
+  0%, 100% { r: 5; opacity: 0.7; }
+  50% { r: 7; opacity: 1; }
+}
+
+.impactCard {
+  position: absolute;
+  left: 20px;
+  top: 2px;
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: var(--deep);
+  color: #fff;
+  z-index: 6;
+  box-shadow: 0 16px 36px rgba(23, 61, 42, 0.22);
+  transition: transform 0.4s var(--ease);
+  animation: floatImpact 5s ease-in-out infinite alternate;
+}
+
+.impactCard:hover {
+  transform: translateY(-5px) scale(1.02);
+}
+
+.impactNum {
+  display: block;
+  color: var(--green);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+}
+
+.impactLabel {
+  font-size: 0.72rem;
+  color: #cbd9ce;
+  font-weight: 500;
+}
+
+@keyframes floatImpact {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-7px); }
+}
+
 .dashboard {
-  position: relative;
-  width: min(480px, 100%);
-  padding: 22px;
+  position: absolute;
+  right: 0;
+  top: 64px;
+  width: min(470px, 100%);
+  padding: 20px;
   background: var(--white);
   border: 1px solid var(--line);
-  border-radius: var(--r-card-lg);
+  border-radius: 22px;
   box-shadow: var(--shadow);
-  z-index: 3;
-  animation: dashboardFloat 6s ease-in-out infinite alternate;
+  z-index: 4;
+  animation: dashboardFloat 8s ease-in-out infinite alternate;
+}
+
+@keyframes dashboardFloat {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-6px); }
 }
 
 .dashHead {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .dashGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
 }
 
 .dashCard {
@@ -297,12 +371,131 @@
   color: var(--ink);
 }
 
+.foodPhotoWrap {
+  position: absolute;
+  left: -10px;
+  bottom: 16px;
+  z-index: 7;
+  transform: rotate(-7deg);
+  transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+}
+
+.foodPhotoWrap:hover {
+  transform: rotate(0deg) scale(1.06);
+}
+
+.foodPhoto {
+  width: 178px;
+  height: 178px;
+  object-fit: cover;
+  border: 11px solid var(--white);
+  border-radius: 50%;
+  box-shadow: 0 20px 48px rgba(23, 61, 42, 0.22);
+  display: block;
+}
+
+.foodTag {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--deep);
+  color: var(--white);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+}
+
+.driverFloatCard {
+  position: absolute;
+  right: -8px;
+  bottom: 10px;
+  width: 195px;
+  padding: 13px 15px;
+  border-radius: 18px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  z-index: 7;
+  transform: rotate(3deg);
+  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+
+.driverFloatCard:hover {
+  transform: rotate(0deg) translateY(-5px);
+  box-shadow: 0 24px 50px rgba(23, 61, 42, 0.16);
+}
+
+.driverCardHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.driverIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.driverCardHead strong {
+  display: block;
+  font-size: 0.84rem;
+  color: var(--deep);
+  font-weight: 700;
+}
+
+.driverCardHead small {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.driverStatus {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--green-dark);
+  background: var(--soft);
+  padding: 5px 9px;
+  border-radius: var(--r-pill);
+}
+
+.driverPulseDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green-dark);
+  box-shadow: 0 0 0 0 rgba(73, 140, 48, 0.7);
+  animation: driverPulse 1.8s infinite;
+}
+
+@keyframes driverPulse {
+  0% { box-shadow: 0 0 0 0 rgba(73, 140, 48, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(73, 140, 48, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(73, 140, 48, 0); }
+}
+
 @media (max-width: 960px) {
   .heroGrid {
     grid-template-columns: 1fr;
     gap: 40px;
   }
   .heroVisual {
-    min-height: auto;
+    height: 520px;
+    max-width: 500px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .foodPhotoWrap {
+    left: 4px;
+  }
+  .driverFloatCard {
+    right: 4px;
   }
 }

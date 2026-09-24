@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '../../store/session';
@@ -14,17 +14,30 @@ export const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [rolesMenuOpen, setRolesMenuOpen] = useState(false);
+  const rolesMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScroll = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      setScrolled(currentScroll > 20);
+      setScrolled(currentScroll > 15);
       setScrollProgress(docHeight > 0 ? (currentScroll / docHeight) * 100 : 0);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close roles dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (rolesMenuRef.current && !rolesMenuRef.current.contains(e.target as Node)) {
+        setRolesMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const toggleLanguage = () => {
@@ -36,10 +49,13 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      {/* Scroll progress bar */}
+      {/* Scroll progress bar - only visible when scrolled */}
       <div
         className={styles.progressBar}
-        style={{ width: `${scrollProgress}%` }}
+        style={{
+          width: `${scrollProgress}%`,
+          opacity: scrollProgress > 1 ? 1 : 0,
+        }}
         role="progressbar"
         aria-valuenow={Math.round(scrollProgress)}
       />
@@ -49,7 +65,7 @@ export const Header: React.FC = () => {
           {/* Logo */}
           <Link to="/" className={styles.brand} aria-label="GoldenHour Home">
             <span className={styles.brandMark}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.5" />
                 <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
               </svg>
@@ -64,7 +80,7 @@ export const Header: React.FC = () => {
             {isLanding ? (
               <>
                 <a href="#how-it-works" className={styles.navLink}>{t('nav.howItWorks', 'How it works')}</a>
-                <a href="#problem" className={styles.navLink}>{t('nav.theClock', 'The Clock')}</a>
+                <a href="#problem" className={styles.navLink}>{t('nav.theClock', 'The clock')}</a>
                 <a href="#impact" className={styles.navLink}>{t('nav.impact', 'Impact')}</a>
                 <a href="#faq" className={styles.navLink}>{t('nav.faq', 'FAQ')}</a>
               </>
@@ -91,17 +107,74 @@ export const Header: React.FC = () => {
               {i18n.language.startsWith('hi') ? '🇮🇳 HI' : '🇬🇧 EN'}
             </button>
 
-            {/* Quick Demo Switcher */}
-            <div className={styles.demoPills}>
-              <Link to="/donor" className={styles.rolePill} title="Donor Portal">Donor</Link>
-              <Link to="/org" className={styles.rolePill} title="Shelter Portal">Shelter</Link>
-              <Link to="/driver" className={styles.rolePill} title="Driver App">Driver</Link>
-              <Link to="/ops" className={`${styles.rolePill} ${styles.opsPill}`} title="Ops Live Console">Ops</Link>
+            {/* Quick Demo Roles Dropdown */}
+            <div className={styles.rolesDropdownContainer} ref={rolesMenuRef}>
+              <button
+                type="button"
+                className={styles.rolesDropdownTrigger}
+                onClick={() => setRolesMenuOpen(!rolesMenuOpen)}
+                aria-expanded={rolesMenuOpen}
+              >
+                <span>Jaipur Portals</span>
+                <span className={styles.chevron}>{rolesMenuOpen ? '▲' : '▼'}</span>
+              </button>
+
+              {rolesMenuOpen && (
+                <div className={styles.rolesMenu}>
+                  <Link
+                    to="/donor"
+                    className={styles.rolesMenuItem}
+                    onClick={() => setRolesMenuOpen(false)}
+                  >
+                    <span>🍲</span>
+                    <div>
+                      <strong>Donor Portal</strong>
+                      <small>Spice Route Kitchen</small>
+                    </div>
+                  </Link>
+
+                  <Link
+                    to="/org"
+                    className={styles.rolesMenuItem}
+                    onClick={() => setRolesMenuOpen(false)}
+                  >
+                    <span>🏠</span>
+                    <div>
+                      <strong>Shelter Hub</strong>
+                      <small>Asha Shelter Foundation</small>
+                    </div>
+                  </Link>
+
+                  <Link
+                    to="/driver"
+                    className={styles.rolesMenuItem}
+                    onClick={() => setRolesMenuOpen(false)}
+                  >
+                    <span>🛵</span>
+                    <div>
+                      <strong>Driver Cockpit</strong>
+                      <small>Rajesh Kumar (E-Rickshaw)</small>
+                    </div>
+                  </Link>
+
+                  <Link
+                    to="/ops"
+                    className={`${styles.rolesMenuItem} ${styles.opsMenuItem}`}
+                    onClick={() => setRolesMenuOpen(false)}
+                  >
+                    <span>⚡</span>
+                    <div>
+                      <strong>Ops Live Console</strong>
+                      <small>Realtime Jaipur Telemetry</small>
+                    </div>
+                  </Link>
+                </div>
+              )}
             </div>
 
             {user ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span className={styles.userBadge}>{user.name} ({user.role})</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className={styles.userBadge}>{user.name}</span>
                 <Button
                   variant="outline"
                   size="sm"

@@ -160,6 +160,19 @@ export const HeroSection: React.FC = () => {
           <div className={styles.backShape} />
           <div className={styles.sceneGrid} />
 
+          {/* Connecting SVG Signal Line */}
+          <svg className={styles.signalLine} viewBox="0 0 560 570" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M500 470 C425 455 385 410 365 365 C345 320 330 285 305 245 C278 202 240 165 165 112" />
+            <circle className={styles.signalNode} cx="500" cy="470" r="5" />
+            <circle className={styles.signalNode} cx="305" cy="245" r="5" />
+          </svg>
+
+          {/* Floating Top Impact Card */}
+          <div className={styles.impactCard}>
+            <b className={styles.impactNum}>48,260</b>
+            <small className={styles.impactLabel}>meals rescued in Jaipur</small>
+          </div>
+
           {/* Floating Live Dashboard Card */}
           <div className={styles.dashboard}>
             <div className={styles.dashHead}>
@@ -213,6 +226,32 @@ export const HeroSection: React.FC = () => {
             <div className={styles.dashFooter}>
               <span>🥘 <strong>Spice Route Kitchen:</strong> 40 hot meals transferred safely</span>
               <span style={{ color: 'var(--green-dark)', fontWeight: 700 }}>✓ Verified</span>
+            </div>
+          </div>
+
+          {/* Floating Fresh Food Photo */}
+          <div className={styles.foodPhotoWrap}>
+            <img
+              src="/food-hero.jpg"
+              alt="Fresh surplus meals ready for delivery in Jaipur"
+              className={styles.foodPhoto}
+              loading="eager"
+            />
+            <span className={styles.foodTag}>♨️ Fresh & Hot</span>
+          </div>
+
+          {/* Floating Driver / Dispatch Mini-Card */}
+          <div className={styles.driverFloatCard}>
+            <div className={styles.driverCardHead}>
+              <span className={styles.driverIcon}>🛵</span>
+              <div>
+                <strong>Rajesh Kumar</strong>
+                <small>E-Rickshaw #RJ-14-ER</small>
+              </div>
+            </div>
+            <div className={styles.driverStatus}>
+              <span className={styles.driverPulseDot} />
+              <span>4 mins to C-Scheme pickup</span>
             </div>
           </div>
         </div>

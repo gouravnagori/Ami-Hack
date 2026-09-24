@@ -41,6 +41,8 @@
   color: var(--deep);
   font-size: 1.35rem;
   letter-spacing: -0.03em;
+  flex-shrink: 0;
+  margin-right: 36px;
 }
 
 .brandMark {
@@ -57,6 +59,7 @@
 
 .brandText {
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .brandText strong {
@@ -67,6 +70,7 @@
   display: flex;
   align-items: center;
   gap: 28px;
+  margin-right: auto;
 }
 
 .navLink {
@@ -74,6 +78,7 @@
   font-weight: 500;
   color: var(--muted);
   transition: color 0.2s ease;
+  white-space: nowrap;
 }
 
 .navLink:hover,
@@ -86,6 +91,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .langBtn {
@@ -102,38 +108,100 @@
   background: var(--green);
 }
 
-.demoPills {
-  display: flex;
+.rolesDropdownContainer {
+  position: relative;
+}
+
+.rolesDropdownTrigger {
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  background: var(--paper);
-  padding: 3px;
+  gap: 6px;
+  background: var(--soft);
+  color: var(--deep);
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 7px 14px;
   border-radius: var(--r-pill);
   border: 1px solid var(--line);
-}
-
-.rolePill {
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 4px 9px;
-  border-radius: var(--r-pill);
-  color: var(--muted);
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
-.rolePill:hover {
+.rolesDropdownTrigger:hover {
+  background: var(--paper);
+  border-color: var(--green-dark);
+}
+
+.chevron {
+  font-size: 0.65rem;
+  transition: transform 0.2s ease;
+}
+
+.rolesMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 240px;
   background: var(--white);
+  border-radius: var(--r-card);
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 32px rgba(23, 61, 42, 0.12);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 100;
+  animation: dropdownFade 0.18s ease-out;
+}
+
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.rolesMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
   color: var(--deep);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: background 0.15s ease;
 }
 
-.opsPill {
-  background: var(--deep);
-  color: var(--white) !important;
+.rolesMenuItem span {
+  font-size: 1.25rem;
+  line-height: 1;
 }
 
-.opsPill:hover {
-  background: #11291d !important;
+.rolesMenuItem div {
+  display: flex;
+  flex-direction: column;
+}
+
+.rolesMenuItem strong {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--deep);
+}
+
+.rolesMenuItem small {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.rolesMenuItem:hover {
+  background: var(--soft);
+}
+
+.opsMenuItem {
+  background: #f0f7f3;
+  border: 1px solid rgba(23, 61, 42, 0.08);
+}
+
+.opsMenuItem:hover {
+  background: #e3f1e9;
 }
 
 .userBadge {
@@ -169,7 +237,7 @@
 
 @media (max-width: 900px) {
   .nav,
-  .demoPills {
+  .rolesDropdownContainer {
     display: none;
   }
 
