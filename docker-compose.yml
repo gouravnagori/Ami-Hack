@@ -1,0 +1,84 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: goldenhour-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: goldenhour
+      POSTGRES_PASSWORD: goldenhour
+      POSTGRES_DB: goldenhour
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U goldenhour -d goldenhour"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: goldenhour-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: goldenhour-api
+    restart: unless-stopped
+    environment:
+      APP_ENV: development
+      DEBUG: "true"
+      DATABASE_URL: postgresql+asyncpg://goldenhour:goldenhour@postgres:5432/goldenhour
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: goldenhour-insecure-dev-secret-key-change-in-production-min32chars
+      DEMO_MODE: "true"
+      OSRM_URL: http://osrm:5000
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: goldenhour-worker
+    restart: unless-stopped
+    command: ["python", "-m", "arq", "app.workers.settings.WorkerSettings"]
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgresql+asyncpg://goldenhour:goldenhour@postgres:5432/goldenhour
+      REDIS_URL: redis://redis:6379/0
+      DEMO_MODE: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  osrm:
+    image: osrm/osrm-backend:latest
+    container_name: goldenhour-osrm
+    restart: unless-stopped
+    profiles: ["osrm"]
+    ports:
+      - "5000:5000"
+
+volumes:
+  postgres_data:
+  redis_data:

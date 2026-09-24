@@ -1,3 +1,4 @@
+# ─── Frontend ───────────────────────────────────
 # Dependencies
 node_modules/
 **/node_modules/
@@ -30,3 +31,37 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# ─── Backend (Python / FastAPI) ─────────────────
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python bytecode
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# SQLite database (local dev only)
+*.db
+
+# Test / QA caches
+.pytest_cache/
+.hypothesis/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# IDE
+*.pyc
+
+# Generated reference files
+reference.html
