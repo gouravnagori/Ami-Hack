@@ -65,3 +65,6 @@ coverage.xml
 
 # Generated reference files
 reference.html
+
+# Build / egg-info
+*.egg-info/
