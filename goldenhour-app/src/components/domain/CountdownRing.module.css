@@ -1,0 +1,44 @@
+.ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sm { width: 44px; height: 44px; }
+.md { width: 88px; height: 88px; }
+.lg { width: 168px; height: 168px; }
+
+.center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.time {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  letter-spacing: -.07em;
+  line-height: 1;
+}
+
+.sm .time { font-size: .72rem; }
+.md .time { font-size: 1.1rem; }
+.lg .time { font-size: 1.8rem; }
+
+.label {
+  font-size: .64rem;
+  color: var(--muted);
+  margin-top: 2px;
+  text-align: center;
+  max-width: 80%;
+  line-height: 1.2;
+}
+
+.critical {
+  animation: criticalPulse 2s ease-in-out infinite;
+}

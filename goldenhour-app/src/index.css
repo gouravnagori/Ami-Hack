@@ -1,0 +1,10 @@
+@import './styles/tokens.css';
+@import './styles/base.css';
+@import './styles/motion.css';
+
+/* Global root setup for full viewport responsiveness */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

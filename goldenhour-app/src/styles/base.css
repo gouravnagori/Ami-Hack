@@ -1,0 +1,209 @@
+/* ============================================================
+   GoldenHour — Base Styles
+   Reset, typography, layout, buttons — from reference HTML
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.55 "DM Sans", sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font: inherit; cursor: pointer; border: none; background: none; }
+
+button:focus-visible,
+a:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+img { display: block; max-width: 100%; }
+
+/* ── Container ── */
+.wrap {
+  width: var(--container);
+  margin: auto;
+}
+
+/* ── Typography ── */
+h1 {
+  font-size: clamp(3.5rem, 6.3vw, 6.25rem);
+  line-height: .9;
+  letter-spacing: -.075em;
+  font-weight: 700;
+}
+
+h1 em {
+  font: italic 1.07em "Instrument Serif", serif;
+  color: var(--deep);
+}
+
+h2 {
+  font-size: clamp(2.4rem, 4.8vw, 4.5rem);
+  line-height: .95;
+  letter-spacing: -.065em;
+  font-weight: 700;
+}
+
+h2 em {
+  font: italic 1.07em "Instrument Serif", serif;
+  color: var(--deep);
+}
+
+/* ── Eyebrow ── */
+.eyebrow {
+  color: var(--deep);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.dark .eyebrow { color: var(--green); }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: var(--r-pill);
+  font-weight: 700;
+  font-size: .9rem;
+  transition:
+    transform .35s var(--ease),
+    box-shadow .35s var(--ease),
+    background .35s var(--ease),
+    border-color .35s var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:hover { transform: translateY(-3px); }
+.btn:active { transform: translateY(-1px) scale(.97); }
+
+.btn .arrow {
+  display: inline-block;
+  transition: transform .35s var(--ease);
+}
+.btn:hover .arrow { transform: translateX(4px); }
+
+.btn-primary {
+  background: var(--green);
+  box-shadow: 0 9px 22px #8fd35a40;
+  color: var(--ink);
+}
+.btn-primary:hover {
+  background: #99dc68;
+  box-shadow: 0 13px 30px #8fd35a55;
+}
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,.35) 48%, transparent 72%);
+  transform: translateX(-130%);
+  transition: transform .8s var(--ease);
+}
+.btn-primary:hover::before {
+  transform: translateX(130%);
+}
+
+.btn-outline {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+}
+.btn-outline:hover {
+  border-color: var(--ink);
+  background: #ffffff88;
+}
+
+.btn-danger {
+  background: var(--red);
+  color: var(--white);
+  box-shadow: 0 9px 22px rgba(217, 107, 75, .25);
+}
+
+.btn-lg {
+  min-height: 56px;
+  padding: 16px 24px;
+  font-size: 1rem;
+}
+
+.btn-sm {
+  min-height: 36px;
+  padding: 8px 14px;
+  font-size: .8rem;
+}
+
+.btn-block { width: 100%; }
+
+/* ── Sections ── */
+section { padding: 105px 0; }
+
+.head {
+  max-width: 700px;
+  margin-bottom: 42px;
+}
+.head h2 { margin-bottom: 16px; }
+.head p {
+  color: var(--muted);
+  font-size: 1.04rem;
+}
+
+.dark {
+  background: var(--deep);
+  color: #fff;
+}
+.dark .head p { color: var(--on-dark-muted); }
+
+/* ── Cards ── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card-lg);
+  padding: 18px;
+}
+
+.card-sm {
+  border-radius: var(--r-card-sm);
+  padding: 14px;
+}
+
+.card-floating { box-shadow: var(--shadow); }
+.card-inline { box-shadow: var(--shadow-soft); }
+
+/* ── Labels ── */
+.label-sm {
+  font-size: .64rem;
+  color: var(--muted);
+}
+
+.label-xs {
+  font-size: .61rem;
+  color: var(--muted);
+}
+
+/* ── Grid helpers ── */
+.wide { grid-column: span 2; }
+
+/* ── Responsive ── */
+@media (max-width: 650px) {
+  .wrap { width: calc(100% - 28px); }
+  h1 { font-size: clamp(3.2rem, 15vw, 5rem); }
+  section { padding: 72px 0; }
+}

@@ -1,0 +1,59 @@
+/* ============================================================
+   GoldenHour — Design Tokens
+   Ported from OptiMeal reference HTML (source of truth)
+   ============================================================ */
+
+:root {
+  /* ── Palette ── */
+  --ink: #17221b;
+  --deep: #173d2a;
+  --green: #8fd35a;
+  --green-dark: #69a83f;
+  --soft: #e6f1df;
+  --paper: #f7f6f1;
+  --white: #fff;
+  --cream: #f1e8d2;
+  --muted: #68736b;
+  --line: #dce5da;
+  --red: #d96b4b;
+  --blue: #8db8c9;
+  --blue-text: #4d869d;
+  --blue-tint: #f1f7fa;
+  --warn-tint: #fff5f1;
+  --analytics-bg: #f2f7f0;
+  --on-dark-muted: #cbd9ce;
+  --bar-idle: #c8dfbc;
+  --peach: #f0a083;
+  --peach-soft: #f5b19d;
+
+  /* ── Motion ── */
+  --ease: cubic-bezier(.16, 1, .3, 1);
+
+  /* ── Elevation ── */
+  --shadow: 0 25px 70px rgba(23, 61, 42, .12);
+  --shadow-soft: 0 14px 38px rgba(23, 61, 42, .08);
+
+  /* ── Layout ── */
+  --container: min(1160px, calc(100% - 40px));
+  --header-h: 78px;
+  --header-bg: #f7f6f1e8;
+
+  /* ── Radii ── */
+  --r-pill: 999px;
+  --r-card-lg: 22px;
+  --r-card-sm: 14px;
+  --r-logo: 11px 11px 11px 4px;
+
+  /* ── Focus ── */
+  --focus-ring: 3px solid #8db8c988;
+  --focus-offset: 4px;
+
+  /* ── Semantic (Risk) ── */
+  --risk-safe-fill: var(--green);
+  --risk-safe-track: var(--soft);
+  --risk-safe-text: var(--deep);
+  --risk-tight-fill: var(--peach);
+  --risk-tight-text: var(--deep);
+  --risk-critical-fill: var(--red);
+  --risk-critical-text: #fff;
+}

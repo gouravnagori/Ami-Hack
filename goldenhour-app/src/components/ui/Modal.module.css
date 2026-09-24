@@ -1,0 +1,50 @@
+.dialog {
+  border: none;
+  border-radius: var(--r-card-lg);
+  padding: 0;
+  max-width: 560px;
+  width: calc(100% - 32px);
+  box-shadow: var(--shadow);
+  animation: pathOpen .55s var(--ease) both;
+}
+
+.dialog::backdrop {
+  background: rgba(23, 34, 27, .45);
+  backdrop-filter: blur(6px);
+}
+
+.content {
+  padding: 28px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -.03em;
+}
+
+.close {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--muted);
+  font-size: 1.2rem;
+  display: grid;
+  place-items: center;
+  transition: transform .3s var(--ease), background .3s ease;
+  cursor: pointer;
+}
+
+.close:hover {
+  transform: rotate(90deg);
+  background: var(--soft);
+}

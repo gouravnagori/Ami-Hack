@@ -1,0 +1,317 @@
+{
+  "app": {
+    "name": "GoldenHour",
+    "tagline": "Smarter food rescue for donors, shelters, drivers and the planet."
+  },
+  "nav": {
+    "product": "Product",
+    "theClock": "The clock",
+    "howItWorks": "How it works",
+    "donors": "Donors",
+    "shelters": "Shelters",
+    "drivers": "Drivers",
+    "impact": "Impact",
+    "login": "Log in",
+    "choosePath": "Choose your path"
+  },
+  "hero": {
+    "donor": {
+      "eyebrow": "FOR DONORS",
+      "h1_pre": "Post the surplus.",
+      "h1_em": "We race the clock.",
+      "p": "Tell us what's left in under a minute. GoldenHour finds a shelter that can take it in time, and a driver to carry it."
+    },
+    "shelter": {
+      "eyebrow": "FOR SHELTERS AND NGOs",
+      "h1_pre": "Know what's coming,",
+      "h1_em": "before it arrives.",
+      "p": "See safe, diet-matched donations with time to spare. Accept what fits your capacity and track every pickup live."
+    },
+    "driver": {
+      "eyebrow": "FOR DRIVERS",
+      "h1_pre": "One clean route.",
+      "h1_em": "Every stop on time.",
+      "p": "Get stacked pickups and drop-offs planned around expiry windows, with live re-routing when things change."
+    },
+    "shared": "GoldenHour turns surplus food into a live, time-boxed match, so more of it reaches a plate before it spoils.",
+    "cta_primary": "See a rescue in action",
+    "cta_outline": "Choose your path",
+    "trust": {
+      "diet": "Diet and cold-chain aware",
+      "time": "Time-window safe",
+      "tracking": "Live tracking"
+    },
+    "tonight": "Tonight's rescue",
+    "live": "Live",
+    "posted": "Portions posted",
+    "delivered": "Delivered before expiry",
+    "caption_most": "Most matches land in minutes.",
+    "rescued": "meals rescued",
+    "illustrative": "(illustrative)",
+    "portionsInPlay": "Portions in play",
+    "onTime": "On time",
+    "atRisk": "At risk",
+    "atRiskSub": "Being re-routed",
+    "avgMatch": "Avg time to match",
+    "rescuedThisWeek": "Rescued this week",
+    "bestMatch": "Best match now",
+    "bestMatchDetail": "Asha Shelter · 2.1 km · 38 min to spare",
+    "driverOffer": "New pickup",
+    "pickup": "Pickup",
+    "pickupPlace": "Spice Route Kitchen",
+    "drop": "Drop",
+    "dropPlace": "Asha Shelter",
+    "accept": "Accept",
+    "routeUpdated": "Route updated · +1 stop"
+  },
+  "problem": {
+    "eyebrow": "THE PROBLEM",
+    "h2": "Most surplus food fails because of the clock.",
+    "p": "The food is safe. The people are hungry. What's missing is a match that lands before the window closes.",
+    "left": "Left at closing time",
+    "reached": "Reached a plate before expiry",
+    "lost": "72 still lost — sent to compost partners",
+    "portions": "portions"
+  },
+  "waste": {
+    "eyebrow": "THE COST OF DELAY",
+    "h2_pre": "Every minute of delay",
+    "h2_em": "costs a meal.",
+    "card": "What one late match costs",
+    "point1_title": "Food has a 2–6 hour window",
+    "point1_text": "Most surplus is safe to donate for only a few hours.",
+    "point2_title": "Phone calls and group chats don't scale",
+    "point2_text": "Coordination breaks down past a handful of relationships.",
+    "point3_title": "Impact should leave a paper trail",
+    "point3_text": "Receipts and reports for donors, funders and regulators.",
+    "cta_surplus": "I have surplus food",
+    "cta_feed": "We feed people"
+  },
+  "howItWorks": {
+    "eyebrow": "HOW IT WORKS",
+    "steps": [
+      { "num": "01", "title": "Post surplus", "desc": "Add items, diet, storage and safe-until time. Under a minute." },
+      { "num": "02", "title": "Match in time", "desc": "We filter by diet, cold chain, capacity at arrival and time window, then rank." },
+      { "num": "03", "title": "Dispatch a driver", "desc": "Nearby drivers get one clean route, stacked when it saves time." },
+      { "num": "04", "title": "Delivered and counted", "desc": "OTP-verified handoff, live status, and an impact record." }
+    ]
+  },
+  "donorSection": {
+    "eyebrow": "FOR DONORS",
+    "quickPost": "Quick post",
+    "placeholder": "60 plates veg dal-rice, cooked 7 pm",
+    "safeUntil": "Safe until",
+    "feasibility": "3 shelters can take this in time",
+    "postSurplus": "Post surplus",
+    "features": [
+      { "title": "Post in seconds", "desc": "" },
+      { "title": "Repeat last donation", "desc": "" },
+      { "title": "Get a receipt automatically", "desc": "" }
+    ]
+  },
+  "shelterSection": {
+    "eyebrow": "FOR SHELTERS",
+    "freeNow": "Free now",
+    "at8pm": "At 8 pm",
+    "coldSpace": "Cold space",
+    "features": [
+      { "title": "Capacity that updates itself", "desc": "" },
+      { "title": "Accept part of a donation", "desc": "" },
+      { "title": "Know exactly when it arrives", "desc": "" }
+    ]
+  },
+  "driverSection": {
+    "eyebrow": "FOR DRIVERS",
+    "features": [
+      { "title": "Stacked pickups, one route", "desc": "" },
+      { "title": "Live re-routing", "desc": "" },
+      { "title": "Simple proof of handoff", "desc": "" }
+    ]
+  },
+  "pipeline": {
+    "eyebrow": "THE DECISION PIPELINE",
+    "h2": "Turn scattered constraints into one match and one route.",
+    "inputs": [
+      { "label": "Time window", "detail": "Expiry" },
+      { "label": "Capacity", "detail": "Now and at arrival" },
+      { "label": "Diet and cold chain", "detail": "Veg, egg, non-veg" }
+    ],
+    "engine": "Dispatch engine",
+    "engineSub": "Calculating best match",
+    "output": "Best match",
+    "outputName": "Asha Shelter",
+    "outputSlack": "38 min to spare"
+  },
+  "impactSection": {
+    "eyebrow": "IMPACT VIEW",
+    "h2": "See what faster matching makes possible.",
+    "chart": "Meals rescued per week",
+    "medianMatch": "Median time to match",
+    "onTimeDelivery": "On-time delivery",
+    "co2": "CO₂e avoided (estimate)",
+    "illustrative": "Illustrative example"
+  },
+  "faq": {
+    "eyebrow": "FAQ",
+    "items": [
+      {
+        "q": "How does GoldenHour keep food safe?",
+        "a": "Every donation gets a safe-until time. We only match food that can arrive before it, and we never route food past it."
+      },
+      {
+        "q": "What if a shelter can't take it?",
+        "a": "Offers move to the next best shelter automatically. If none can, it goes to a compost or animal-feed partner."
+      },
+      {
+        "q": "Do I need to install an app?",
+        "a": "No. It's a web app you can add to your home screen."
+      },
+      {
+        "q": "What if a driver is running late?",
+        "a": "We re-plan the route, hand the stop to a closer driver, or alert everyone involved."
+      }
+    ]
+  },
+  "cta": {
+    "h2": "Every rescued plate starts with one post.",
+    "surplus": "I have surplus food",
+    "feed": "We feed people",
+    "drive": "I can drive"
+  },
+  "auth": {
+    "choosePath": "Choose your path",
+    "donor": "I have surplus food",
+    "shelter": "We feed people",
+    "driver": "I can drive",
+    "tryDemo": "Try the demo as",
+    "login": "Log in",
+    "register": "Register",
+    "businessName": "Business name",
+    "orgName": "Organisation name",
+    "name": "Name",
+    "phone": "Phone",
+    "email": "Email",
+    "password": "Password",
+    "address": "Address",
+    "fssai": "FSSAI number (optional)",
+    "fssaiHint": "Adds a Verified badge",
+    "vehicleType": "Vehicle type",
+    "loadCapacity": "Load capacity (portions)",
+    "coldBox": "Cold box",
+    "serviceRadius": "Service radius",
+    "continue": "Continue",
+    "back": "Back"
+  },
+  "donor": {
+    "home": "Home",
+    "post": "Post",
+    "impact": "Impact",
+    "postedToday": "Posted today",
+    "deliveredToday": "Delivered",
+    "mealsRescued": "Meals rescued",
+    "co2Avoided": "CO₂e avoided",
+    "emptyTitle": "Nothing posted tonight.",
+    "emptyDesc": "Post surplus and we'll start the clock.",
+    "postSurplus": "Post surplus",
+    "describe": "Describe what's left",
+    "safeUntil": "Safe until",
+    "safeUntilHelper": "Max 4 h for hot meals",
+    "pickupWindow": "Pickup window",
+    "repeatLast": "Repeat last donation",
+    "surplusPosted": "Surplus posted",
+    "matchingNow": "Matching now.",
+    "cancel": "Cancel",
+    "cancelConfirm": "Cancel this donation? It cannot be undone.",
+    "downloadReceipt": "Download receipt",
+    "pickupOtp": "Pickup OTP",
+    "otpHint": "Give this code to the driver.",
+    "whyThisShelter": "Why this shelter?"
+  },
+  "org": {
+    "freeNow": "Free now",
+    "of": "of",
+    "freeSpace": "Free space over the next 6 hours",
+    "offers": "Offers",
+    "incoming": "Incoming",
+    "whyYou": "Why you?",
+    "accept": "Accept",
+    "notNow": "Not now",
+    "take": "Take",
+    "ofTotal": "of",
+    "confirmDelivery": "Confirm delivery",
+    "receivedPortions": "Received portions",
+    "weAreOpen": "We're open tonight",
+    "weFull": "We're full right now",
+    "fullPaused": "Paused — no new offers",
+    "acceptVeg": "Accept: Veg",
+    "acceptEgg": "Accept: Egg",
+    "acceptNonVeg": "Accept: Non-veg",
+    "coldStorage": "Cold storage available",
+    "maxPortions": "Max portions",
+    "serviceRate": "Service rate per hour",
+    "openingHours": "Opening hours"
+  },
+  "driver": {
+    "goOnline": "Go online",
+    "goOffline": "Go offline",
+    "waiting": "Waiting for a pickup",
+    "stopsToday": "Stops",
+    "kmToday": "Distance",
+    "mealsToday": "Meals",
+    "heatZone": "Busy soon near",
+    "gpsWarning": "GPS permission needed for pickups",
+    "newPickup": "New pickup",
+    "accept": "Accept",
+    "decline": "Decline",
+    "onTimeConfidence": "On-time confidence",
+    "detour": "detour",
+    "navigate": "Navigate",
+    "arrived": "I've arrived",
+    "enterOtp": "Enter OTP",
+    "complete": "Complete",
+    "reportProblem": "Report a problem",
+    "routeUpdated": "Route updated",
+    "saves": "saves",
+    "doneTitle": "Meals delivered",
+    "nextOffer": "Waiting for next offer",
+    "reconnecting": "Reconnecting…",
+    "offline": "You're offline. Data will sync when connected."
+  },
+  "ops": {
+    "title": "Ops Console",
+    "simulate": "Simulate",
+    "chaos": "Chaos",
+    "normal": "Normal",
+    "rushHour": "Rush hour",
+    "weddingNight": "Wedding night",
+    "driverDrops": "Driver drops out",
+    "shelterFull": "Shelter says full",
+    "trafficSpike": "Traffic spike",
+    "routingDown": "Routing service down",
+    "speed": "Speed",
+    "onTimeRate": "On-time rate",
+    "medianMatch": "Median match",
+    "activeRoutes": "Active routes",
+    "atRisk": "At risk",
+    "eventLog": "Event log"
+  },
+  "common": {
+    "portions": "portions",
+    "veg": "Veg",
+    "egg": "Egg",
+    "nonVeg": "Non-veg",
+    "ambient": "Ambient",
+    "hot": "Hot",
+    "cold": "Cold",
+    "safe": "Safe",
+    "tight": "Tight",
+    "critical": "Critical",
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "confirm": "Confirm"
+  }
+}

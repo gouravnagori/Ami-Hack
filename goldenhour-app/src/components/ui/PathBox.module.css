@@ -1,0 +1,81 @@
+.box {
+  margin-top: 15px;
+  width: min(590px, 100%);
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #ffffffee;
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(10px);
+  animation: pathOpen .55s var(--ease) both;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.heading strong { font-size: .82rem; }
+
+.close {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--muted);
+  font-size: 1.1rem;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform .3s var(--ease), background .3s ease;
+}
+.close:hover {
+  transform: rotate(90deg);
+  background: var(--soft);
+}
+
+.paths {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.path {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  transition: transform .4s var(--ease), border-color .35s ease, background .35s ease, box-shadow .35s ease;
+}
+.path:hover {
+  transform: translateY(-4px);
+  border-color: #b9ceb5;
+  background: #fbfdf9;
+  box-shadow: 0 12px 25px #173d2a0c;
+}
+
+.path div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pathIcon {
+  font-size: 1.2rem;
+}
+
+.path strong {
+  font-size: .82rem;
+}
+
+@media (max-width: 650px) {
+  .paths { grid-template-columns: 1fr; }
+}
