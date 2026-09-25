@@ -1,121 +1,64 @@
 @echo off
-REM ============================================================
-REM  GoldenHour — One-Click Startup Script
-REM  Starts both Backend (FastAPI) and Frontend (Vite/React)
-REM  and connects them together automatically.
-REM ============================================================
-title GoldenHour Startup
+title GoldenHour — All Services
+color 0A
 
 echo.
-echo  ========================================
-echo   GoldenHour - Full Stack Startup
-echo  ========================================
+echo  ============================================
+echo   GoldenHour Food Rescue Platform
+echo   Starting all services...
+echo  ============================================
 echo.
 
-REM --- Step 1: Check Python ---
-python --version >nul 2>&1
-if errorlevel 1 (
-    echo [ERROR] Python is not installed or not in PATH.
-    echo         Install Python 3.12+ from https://python.org
+:: Check Python
+where python >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [ERROR] Python not found. Install Python 3.11+
     pause
     exit /b 1
 )
-echo [OK] Python found.
 
-REM --- Step 2: Check Node.js ---
-node --version >nul 2>&1
-if errorlevel 1 (
-    echo [ERROR] Node.js is not installed or not in PATH.
-    echo         Install Node.js 18+ from https://nodejs.org
+:: Check Node
+where node >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [ERROR] Node.js not found. Install Node 18+
     pause
     exit /b 1
 )
-echo [OK] Node.js found.
 
-REM --- Step 3: Setup Python virtual environment ---
-echo.
-echo [1/6] Setting up Python virtual environment...
-if not exist ".venv" (
-    python -m venv .venv
-    echo       Created .venv
-) else (
-    echo       .venv already exists, skipping creation.
-)
+:: ──────────────────────────────────────────────
+:: 1. Backend — FastAPI (port 8000)
+:: ──────────────────────────────────────────────
+echo [1/2] Starting Backend API (port 8000)...
+cd /d "X:\Golden Hour\Ami-Hack"
+start "GH-Backend" cmd /k "title GH-Backend (port 8000) && color 0B && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
-REM --- Step 4: Install backend dependencies ---
-echo [2/6] Installing backend dependencies...
-call .venv\Scripts\activate.bat
-pip install -e ".[dev]" --quiet 2>nul
-echo       Backend dependencies installed.
-
-REM --- Step 5: Create backend .env if missing ---
-if not exist ".env" (
-    echo [3/6] Creating backend .env from template...
-    copy .env.example .env >nul
-    echo       Created .env — edit secrets for production.
-) else (
-    echo [3/6] Backend .env already exists.
-)
-
-REM --- Step 6: Install frontend dependencies ---
-echo [4/6] Installing frontend dependencies...
-pushd goldenhour-app
-call npm install --silent 2>nul
-echo       Frontend dependencies installed.
-
-REM --- Step 7: Configure frontend to connect to real backend ---
-echo [5/6] Configuring frontend to connect to backend...
-(
-echo # ============================================================
-echo # GoldenHour Environment Configuration
-echo # ============================================================
-echo.
-echo # Toggle Mock Data Layer ^(false = connect to real backend^)
-echo VITE_USE_MOCKS=false
-echo.
-echo # Backend API endpoint
-echo VITE_API_URL=http://localhost:8000/api/v1
-echo VITE_WS_URL=ws://localhost:8000/ws
-echo.
-echo # MapLibre Tile Server
-echo VITE_MAP_STYLE_URL=https://demotiles.maplibre.org/style.json
-) > .env
-echo       Frontend configured to use real backend API.
-popd
-
-REM --- Step 8: Start both servers ---
-echo [6/6] Starting servers...
-echo.
-echo  ========================================
-echo   Starting Backend  : http://localhost:8000
-echo   Starting Frontend : http://localhost:5173
-echo   API Docs (Swagger): http://localhost:8000/docs
-echo  ========================================
-echo.
-echo  Press Ctrl+C in each window to stop.
-echo.
-
-REM Start backend in a new terminal window
-start "GoldenHour Backend (port 8000)" cmd /k "cd /d %~dp0 && call .venv\Scripts\activate.bat && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
-
-REM Wait 3 seconds for backend to start
+:: Wait for backend to be ready
 timeout /t 3 /nobreak >nul
 
-REM Start frontend in a new terminal window
-start "GoldenHour Frontend (port 5173)" cmd /k "cd /d %~dp0\goldenhour-app && npm run dev"
+:: ──────────────────────────────────────────────
+:: 2. Frontend — Vite (port 5173)
+:: ──────────────────────────────────────────────
+echo [2/2] Starting Frontend Dev Server (port 5173)...
+cd /d "X:\Golden Hour\Ami-Hack\goldenhour-app"
+start "GH-Frontend" cmd /k "title GH-Frontend (port 5173) && color 0E && npm run dev"
 
-REM Wait 2 seconds then open browser
-timeout /t 2 /nobreak >nul
+:: Wait for frontend to be ready
+timeout /t 4 /nobreak >nul
+
+:: ──────────────────────────────────────────────
+:: Done
+:: ──────────────────────────────────────────────
+echo.
+echo  ============================================
+echo   All services started!
+echo  ============================================
+echo.
+echo   Backend API:    http://localhost:8000
+echo   Frontend App:   http://localhost:5173
+echo   Health Check:   http://localhost:8000/healthz
+echo   API Docs:       http://localhost:8000/docs
+echo.
+echo   Press any key to open the app in browser...
+pause >nul
+
 start http://localhost:5173
-
-echo.
-echo  [SUCCESS] Both servers are running!
-echo.
-echo  Frontend : http://localhost:5173
-echo  Backend  : http://localhost:8000
-echo  API Docs : http://localhost:8000/docs
-echo.
-echo  Close this window or press any key to exit.
-echo  (The servers will keep running in their own windows)
-echo.
-pause

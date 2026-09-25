@@ -1,3 +1,5 @@
+import random
+import time
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
@@ -21,15 +23,20 @@ from app.db.models.recipient import RecipientOrg
 from app.db.models.user import User
 from app.schemas.auth import (
     DemoLoginRequest,
+    LoginOtpRequest,
     LoginRequest,
     ProfileUpdateRequest,
     RegisterRequest,
+    SendOtpRequest,
     TokenRefreshRequest,
     TokenResponse,
     UserResponse,
 )
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
+
+# In-memory OTP store for email verification and OTP login
+_otp_store: dict[str, dict] = {}
 
 
 def build_token_response(user: User) -> TokenResponse:
@@ -61,9 +68,34 @@ async def register(
     if existing:
         raise AppException(
             code=ErrorCode.VALIDATION_ERROR,
-            message="An account with this phone number or email already exists.",
+            message="An account with this phone number or email already exists. Please sign in instead.",
             status_code=status.HTTP_409_CONFLICT,
         )
+
+    # Verify email OTP if provided
+    if req.otp:
+        clean_email = str(req.email).strip().lower() if req.email else ""
+        otp_entry = _otp_store.get(clean_email)
+        if not otp_entry or otp_entry.get("purpose") != "register":
+            raise AppException(
+                code=ErrorCode.VALIDATION_ERROR,
+                message="Email verification code not found or expired. Please click 'Send Verification Code' again.",
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+        if time.time() > otp_entry.get("expires_at", 0):
+            _otp_store.pop(clean_email, None)
+            raise AppException(
+                code=ErrorCode.VALIDATION_ERROR,
+                message="Email verification code has expired. Please request a new code.",
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+        if otp_entry.get("otp") != req.otp.strip():
+            raise AppException(
+                code=ErrorCode.VALIDATION_ERROR,
+                message="Incorrect email verification code. Please check your inbox and try again.",
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+        _otp_store.pop(clean_email, None)
 
     # Create User
     user = User(
@@ -86,14 +118,14 @@ async def register(
             user_id=user.id,
             org_name=profile_data.get("org_name", req.name),
             kind=profile_data.get("kind", "restaurant"),
-            address=profile_data.get("address", "New Delhi"),
+            address=profile_data.get("address", req.city or "Jaipur"),
             lat=float(profile_data.get("lat", settings.SEED_CENTER_LAT)),
             lng=float(profile_data.get("lng", settings.SEED_CENTER_LNG)),
             fssai_no=profile_data.get("fssai_no"),
             default_pickup_window=profile_data.get("default_pickup_window"),
-            pickup_address=profile_data.get("pickup_address"),
+            pickup_address=profile_data.get("pickup_address") or profile_data.get("address", req.city or "Jaipur"),
             food_category=profile_data.get("food_category"),
-            contact_person=profile_data.get("contact_person"),
+            contact_person=profile_data.get("contact_person", req.name),
             operating_hours=profile_data.get("operating_hours"),
         )
         db.add(donor)
@@ -101,7 +133,7 @@ async def register(
         recipient = RecipientOrg(
             user_id=user.id,
             name=profile_data.get("name", req.name),
-            address=profile_data.get("address", "New Delhi"),
+            address=profile_data.get("address", req.city or "Jaipur"),
             lat=float(profile_data.get("lat", settings.SEED_CENTER_LAT)),
             lng=float(profile_data.get("lng", settings.SEED_CENTER_LNG)),
             fssai_reg_no=profile_data.get("fssai_reg_no"),
@@ -133,6 +165,17 @@ async def register(
     await db.commit()
     await db.refresh(user)
 
+    # Send welcome email notification
+    try:
+        from app.services.notifications.base import notification_service
+        await notification_service.notify_welcome(
+            user_id=str(user.id),
+            email=user.email,
+            role=user.role,
+        )
+    except Exception:
+        pass  # Don't block registration if notification fails
+
     return build_token_response(user)
 
 
@@ -155,6 +198,103 @@ async def login(
 
     if not user.is_active:
         raise ForbiddenException("Account is currently suspended.")
+
+    return build_token_response(user)
+
+
+@router.post("/send-otp")
+async def send_otp(
+    req: SendOtpRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    clean_email = str(req.email).strip().lower()
+
+    # Check existence depending on purpose
+    stmt = select(User).where(User.email == clean_email)
+    existing_user = (await db.execute(stmt)).scalar_one_or_none()
+
+    if req.purpose == "login":
+        if not existing_user:
+            raise AppException(
+                code=ErrorCode.NOT_FOUND,
+                message="No account found with this email address. Please click 'Create Account' to sign up.",
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+        if not existing_user.is_active:
+            raise ForbiddenException("Account is currently suspended. Please contact operations support.")
+    elif req.purpose == "register":
+        if existing_user:
+            raise AppException(
+                code=ErrorCode.VALIDATION_ERROR,
+                message="An account with this email address already exists. Please sign in instead.",
+                status_code=status.HTTP_409_CONFLICT,
+            )
+
+    # Generate 6-digit OTP
+    otp = f"{random.randint(100000, 999999)}"
+    _otp_store[clean_email] = {
+        "otp": otp,
+        "expires_at": time.time() + 600,  # 10 minutes
+        "purpose": req.purpose,
+    }
+
+    # Dispatch email via SMTP
+    try:
+        from app.services.notifications.base import notification_service
+        template_name = "login_otp" if req.purpose == "login" else "email_verification"
+        await notification_service.send(
+            user_id=clean_email,
+            template=template_name,
+            data={"otp": otp, "role": getattr(existing_user, "role", "Member") if existing_user else "Member"},
+            email=clean_email,
+        )
+    except Exception:
+        pass
+
+    return {
+        "success": True,
+        "message": f"A 6-digit verification code has been sent to {clean_email}. Please check your inbox.",
+    }
+
+
+@router.post("/login-otp", response_model=TokenResponse)
+async def login_with_otp(
+    req: LoginOtpRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    clean_email = str(req.email).strip().lower()
+    otp_entry = _otp_store.get(clean_email)
+
+    if not otp_entry or otp_entry.get("purpose") != "login":
+        raise UnauthenticatedException(
+            "Verification code has expired or was not requested. Please request a new code."
+        )
+
+    if time.time() > otp_entry.get("expires_at", 0):
+        _otp_store.pop(clean_email, None)
+        raise UnauthenticatedException(
+            "Verification code has expired. Please request a new code."
+        )
+
+    if otp_entry.get("otp") != req.otp.strip():
+        raise UnauthenticatedException(
+            "Invalid verification code. Please check your email inbox and try again."
+        )
+
+    stmt = select(User).where(User.email == clean_email)
+    user = (await db.execute(stmt)).scalar_one_or_none()
+    if not user:
+        raise AppException(
+            code=ErrorCode.NOT_FOUND,
+            message="No account found with this email address. Please register first.",
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    if not user.is_active:
+        raise ForbiddenException("Account is currently suspended.")
+
+    # Remove used OTP
+    _otp_store.pop(clean_email, None)
 
     return build_token_response(user)
 

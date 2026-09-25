@@ -68,7 +68,9 @@ export const router = createBrowserRouter([
     path: '/profile',
     element: (
       <RootShell>
-        <ProfilePage />
+        <AuthGuard>
+          <ProfilePage />
+        </AuthGuard>
       </RootShell>
     ),
   },

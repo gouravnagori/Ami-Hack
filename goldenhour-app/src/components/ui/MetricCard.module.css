@@ -1,15 +1,19 @@
 .card {
-  padding: 14px;
+  padding: 18px 20px;
+  background: var(--white);
   border: 1px solid var(--line);
-  border-radius: 14px;
-  transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s ease;
+  border-radius: var(--r-card, 14px);
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s ease;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justifyContent: space-between;
 }
 
 .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 9px 25px #173d2a0b;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(23, 61, 42, 0.06);
   border-color: #c8d8c8;
 }
 
@@ -22,7 +26,7 @@
   height: 0;
   background: var(--green);
   border-radius: 0 0 4px 0;
-  transition: height .5s var(--ease);
+  transition: height .4s var(--ease);
 }
 
 .card:hover::after { height: 100%; }
@@ -30,21 +34,27 @@
 .card small {
   display: block;
   color: var(--muted);
-  font-size: .68rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .card strong {
   display: block;
-  font-size: 1.75rem;
-  line-height: 1.1;
-  letter-spacing: -.07em;
-  margin-top: 5px;
+  font-size: 1.85rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin: 6px 0 4px;
 }
 
 .card em {
   font-style: normal;
-  color: var(--deep);
-  font-size: .67rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: block;
 }
 
 .blue {

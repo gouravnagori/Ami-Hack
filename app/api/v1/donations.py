@@ -35,6 +35,7 @@ from app.schemas.donation import (
     DonationPreviewResponse,
     DonationSchema,
 )
+from app.services.ai.groq_service import groq_service
 from app.services.ai.parse import parse_donation_text
 from app.services.donations import (
     build_donation_schema,
@@ -123,6 +124,18 @@ async def create_donation_endpoint(
             response_data=schema.model_dump(mode="json"),
         )
         await session.commit()
+
+    # Send donation posted email notification
+    try:
+        from app.services.notifications.base import notification_service
+        await notification_service.notify_donation_posted(
+            user_id=str(current_user.id),
+            email=current_user.email,
+            portions=request.total_portions,
+            diet=request.diet,
+        )
+    except Exception:
+        pass  # Don't block donation creation
 
     return schema
 
@@ -235,11 +248,11 @@ async def parse_donation_endpoint(
     clock: Annotated[Clock, Depends(get_clock)],
     _: Annotated[CurrentUser, Depends(require_role(Role.DONOR, Role.ADMIN))],
 ) -> DonationParseResponse:
-    res = parse_donation_text(text=request.text, photo_base64=request.photo_base64, now=clock.now())
+    res = await groq_service.parse_donation(text=request.text or "", now=clock.now())
     return DonationParseResponse(
-        draft=res["draft"],
-        confidence=res["confidence"],
-        missing=res["missing"],
+        draft=res.get("draft"),
+        confidence=float(res.get("confidence", 0.0)),
+        missing=res.get("missing", []),
     )
 
 

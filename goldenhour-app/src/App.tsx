@@ -3,7 +3,6 @@ import { RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { router } from './routes';
 import { syncClockWithServer } from './lib/clock';
-import { startMockWsSimulation } from './mocks/ws';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,8 +18,12 @@ export const App: React.FC = () => {
     // 1. Sync clock offset
     syncClockWithServer();
 
-    // 2. Start mock WS updates (driver movement, impact ticks)
-    startMockWsSimulation();
+    // 2. Start mock WS updates ONLY when mocks are enabled
+    if (import.meta.env.VITE_USE_MOCKS !== 'false') {
+      import('./mocks/ws').then(({ startMockWsSimulation }) => {
+        startMockWsSimulation();
+      });
+    }
   }, []);
 
   return (
@@ -31,3 +34,4 @@ export const App: React.FC = () => {
 };
 
 export default App;
+

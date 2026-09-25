@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../../lib/api';
 import { useUiStore } from '../../../store/ui';
+import { useSessionStore } from '../../../store/session';
 import { Button } from '../../../components/ui/Button';
 import type { DietType, StorageCondition, Donation, ParseResult } from '../../../types/api';
 
 export const QuickPost: React.FC = () => {
   const navigate = useNavigate();
   const { addToast } = useUiStore();
+  const { user } = useSessionStore();
 
-  const [naturalText, setNaturalText] = useState(
-    '50 veg meals of Paneer Butter Masala and Roti ready in 20 minutes at C-Scheme'
-  );
+  const [naturalText, setNaturalText] = useState('');
   const [parsing, setParsing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -20,14 +20,17 @@ export const QuickPost: React.FC = () => {
   const [diet, setDiet] = useState<DietType>('veg');
   const [storage, setStorage] = useState<StorageCondition>('hot');
   const [safeHours, setSafeHours] = useState(2.5);
-  const [notes] = useState('Packed in 3 insulated metal containers');
+  const [notes] = useState('');
   const [photoAdded, setPhotoAdded] = useState(false);
+  const [pickupAddress, setPickupAddress] = useState(
+    user?.profile?.pickup_address || user?.profile?.address || ''
+  );
 
   const handleAiParse = async () => {
     if (!naturalText.trim()) return;
     setParsing(true);
     try {
-      const res = await api.post<ParseResult>('/api/donations/parse', { text: naturalText });
+      const res = await api.post<ParseResult>('/donations/parse', { text: naturalText });
       if (res.draft.total_portions) setPortions(res.draft.total_portions);
       if (res.draft.diet) setDiet(res.draft.diet);
       if (res.draft.storage) setStorage(res.draft.storage);
@@ -57,12 +60,12 @@ export const QuickPost: React.FC = () => {
           end: safeUntil,
         },
         pickup: {
-          lat: 26.9085,
-          lng: 75.8012,
-          address: 'Spice Route Kitchen, C-Scheme, Jaipur',
+          lat: 0,
+          lng: 0,
+          address: pickupAddress || 'Pickup address',
         },
         notes,
-        items: [{ name: naturalText.slice(0, 35) || 'Fresh Meal Surplus', portions }],
+        items: [{ name: naturalText.slice(0, 35) || 'Meal Surplus', portions }],
       });
 
       addToast('Surplus posted! Algorithmic matching initiated.', 'success');
@@ -243,6 +246,30 @@ export const QuickPost: React.FC = () => {
               value={safeHours}
               onChange={(e) => setSafeHours(Number(e.target.value))}
               style={{ width: '100%', accentColor: 'var(--green-dark)' }}
+            />
+          </div>
+
+          {/* Pickup Address Field */}
+          <div>
+            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--deep)', marginBottom: '6px' }}>
+              Pickup Address / Kitchen Location
+            </label>
+            <input
+              type="text"
+              value={pickupAddress}
+              onChange={(e) => setPickupAddress(e.target.value)}
+              placeholder="e.g. 14, MI Road, C-Scheme, Jaipur"
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: 'var(--r-card-sm)',
+                border: '1px solid var(--line)',
+                background: 'var(--paper)',
+                fontSize: '0.92rem',
+                color: 'var(--ink)',
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
             />
           </div>
 

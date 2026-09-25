@@ -1,4 +1,4 @@
-﻿"""
+"""
 Impact and KPI service — services/impact.py (read-only, pure aggregation).
 
 Reads from impact_ledger and allocations/donations to compute:
@@ -53,6 +53,7 @@ async def get_public_impact(session: AsyncSession) -> ImpactSummary:
         meals_rescued=int(meals_rescued),
         weight_kg=float(weight_kg),
         co2e_kg_avoided=float(co2e_kg_avoided),
+        co2e_kg=float(co2e_kg_avoided),
         on_time_rate=on_time_rate,
         median_time_to_match_s=median_match_s,
         donations_total=int(donations_total),
@@ -93,6 +94,7 @@ async def get_donor_impact(session: AsyncSession, donor_id: uuid.UUID) -> Impact
         meals_rescued=int(meals_rescued),
         weight_kg=float(weight_kg),
         co2e_kg_avoided=float(co2e_kg_avoided),
+        co2e_kg=float(co2e_kg_avoided),
         on_time_rate=on_time_rate,
         median_time_to_match_s=median_match_s,
         donations_total=len(don_ids),
@@ -130,6 +132,7 @@ async def get_org_impact(session: AsyncSession, org_id: uuid.UUID) -> ImpactSumm
         meals_rescued=int(meals_rescued),
         weight_kg=float(weight_kg),
         co2e_kg_avoided=float(co2e_kg_avoided),
+        co2e_kg=float(co2e_kg_avoided),
         on_time_rate=on_time_rate,
         median_time_to_match_s=median_match_s,
         donations_total=len(alloc_ids),
@@ -208,6 +211,7 @@ def _empty_summary() -> ImpactSummary:
         meals_rescued=0,
         weight_kg=0.0,
         co2e_kg_avoided=0.0,
+        co2e_kg=0.0,
         on_time_rate=1.0,
         median_time_to_match_s=0.0,
         donations_total=0,

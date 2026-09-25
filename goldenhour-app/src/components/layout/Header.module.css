@@ -108,6 +108,29 @@
   background: var(--green);
 }
 
+.aiBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(143, 211, 90, 0.22) 0%, rgba(23, 61, 42, 0.08) 100%);
+  color: var(--deep);
+  border: 1px solid rgba(143, 211, 90, 0.5);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 6px 13px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.aiBtn:hover {
+  background: linear-gradient(135deg, var(--green) 0%, #a2e768 100%);
+  border-color: var(--green-dark);
+  box-shadow: 0 4px 12px rgba(143, 211, 90, 0.35);
+  transform: translateY(-1px);
+}
+
 .rolesDropdownContainer {
   position: relative;
 }

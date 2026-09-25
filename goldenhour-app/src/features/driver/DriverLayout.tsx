@@ -37,9 +37,9 @@ export const DriverLayout: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '18px' }}>🛵</span>
           <div>
-            <strong style={{ fontSize: '0.95rem' }}>{user?.name || 'Rajesh Kumar'}</strong>
+            <strong style={{ fontSize: '0.95rem' }}>{user?.name || 'Rescue Driver'}</strong>
             <div style={{ fontSize: '0.72rem', color: 'var(--green)' }}>
-              {user?.profile?.vehicle_type || 'Vehicle'} • {user?.profile?.vehicle_number || user?.profile?.operating_area || 'Jaipur Active'}
+              {user?.profile?.vehicle_type || 'Vehicle'} • {user?.profile?.vehicle_number || user?.profile?.operating_area || user?.city || 'Jaipur Active'}
             </div>
           </div>
         </div>

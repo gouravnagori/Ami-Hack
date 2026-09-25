@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSessionStore } from '../../store/session';
 import { Button } from '../ui/Button';
+import { AiAssistantModal } from '../ai/AiAssistantModal';
 import styles from './Header.module.css';
 
 export const Header: React.FC = () => {
@@ -15,6 +16,7 @@ export const Header: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [rolesMenuOpen, setRolesMenuOpen] = useState(false);
+  const [aiModalOpen, setAiModalOpen] = useState(false);
   const rolesMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -106,6 +108,16 @@ export const Header: React.FC = () => {
               title="Toggle Language"
             >
               {i18n.language.startsWith('hi') ? '🇮🇳 HI' : '🇬🇧 EN'}
+            </button>
+
+            {/* Groq AI Assistant Button */}
+            <button
+              type="button"
+              className={styles.aiBtn}
+              onClick={() => setAiModalOpen(true)}
+              title="GoldenHour AI Assistant"
+            >
+              <span>✨ Ask AI</span>
             </button>
 
             {/* Quick Demo Roles Dropdown */}
@@ -248,6 +260,17 @@ export const Header: React.FC = () => {
               <Link to="/driver" onClick={() => setMobileMenuOpen(false)}>Driver App</Link>
               <Link to="/ops" onClick={() => setMobileMenuOpen(false)}>Ops Console</Link>
               <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>👤 My Profile</Link>
+              <button
+                type="button"
+                className={styles.aiBtn}
+                style={{ width: '100%', justifyContent: 'center', marginTop: '6px' }}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setAiModalOpen(true);
+                }}
+              >
+                ✨ Ask AI Assistant
+              </button>
               <div className={styles.mobileDivider} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0' }}>
                 <span>Language</span>
@@ -259,6 +282,9 @@ export const Header: React.FC = () => {
           </div>
         )}
       </header>
+
+      {/* Global Groq AI Assistant Modal */}
+      <AiAssistantModal isOpen={aiModalOpen} onClose={() => setAiModalOpen(false)} />
     </>
   );
 };

@@ -3,7 +3,6 @@
    Typed fetch wrapper with bearer token, refresh-on-401,
    idempotency keys, error normalisation
    ============================================================ */
-import type { ApiError } from '../types/api';
 import { useSessionStore } from '../store/session';
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
@@ -28,18 +27,43 @@ class ApiClient {
     return headers;
   }
 
-  private async handleResponse<T>(res: Response): Promise<T> {
-    if (res.status === 401) {
+  private async handleResponse<T>(res: Response, path?: string): Promise<T> {
+    const isAuthRequest = path ? path.includes('/auth/login') || path.includes('/auth/register') : false;
+
+    if (res.status === 401 && !isAuthRequest) {
       await this.tryRefresh();
       throw new Error('UNAUTHENTICATED');
     }
 
     if (!res.ok) {
-      const body = await res.json().catch(() => null) as ApiError | null;
-      const msg = body?.error?.message || `Request failed: ${res.status}`;
-      const err = new Error(msg) as Error & { code?: string; details?: unknown };
-      err.code = body?.error?.code || 'UNKNOWN';
-      err.details = body?.error?.details;
+      const body = (await res.json().catch(() => null)) as any;
+      let msg = body?.error?.message || body?.message;
+
+      // Handle FastAPI standard 422 validation detail array
+      if (!msg && Array.isArray(body?.detail)) {
+        const first = body.detail[0];
+        const fieldName = Array.isArray(first?.loc) ? first.loc.slice(1).join(' ') : 'Field';
+        msg = `${fieldName ? fieldName.toUpperCase() + ': ' : ''}${first?.msg || 'Invalid value provided.'}`;
+      } else if (!msg && typeof body?.detail === 'string') {
+        msg = body.detail;
+      }
+
+      if (!msg) {
+        if (res.status === 401) {
+          msg = 'Invalid email, phone number, or password.';
+        } else if (res.status === 409) {
+          msg = 'An account with this email or phone number already exists.';
+        } else if (res.status === 404) {
+          msg = 'The requested resource was not found.';
+        } else {
+          msg = `Request could not be completed (${res.status}).`;
+        }
+      }
+
+      const err = new Error(msg) as Error & { code?: string; details?: unknown; status?: number };
+      err.code = body?.error?.code || (res.status === 401 ? 'INVALID_CREDENTIALS' : 'UNKNOWN');
+      err.details = body?.error?.details || body?.detail;
+      err.status = res.status;
       throw err;
     }
 
@@ -112,7 +136,7 @@ class ApiClient {
       Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
     }
     const res = await fetch(url.toString(), { headers: this.getHeaders() });
-    return this.handleResponse<T>(res);
+    return this.handleResponse<T>(res, path);
   }
 
   async post<T>(path: string, body?: unknown): Promise<T> {
@@ -121,7 +145,7 @@ class ApiClient {
       headers: this.getHeaders(true),
       body: body ? JSON.stringify(body) : undefined,
     });
-    return this.handleResponse<T>(res);
+    return this.handleResponse<T>(res, path);
   }
 
   async put<T>(path: string, body?: unknown): Promise<T> {
@@ -130,7 +154,7 @@ class ApiClient {
       headers: this.getHeaders(),
       body: body ? JSON.stringify(body) : undefined,
     });
-    return this.handleResponse<T>(res);
+    return this.handleResponse<T>(res, path);
   }
 
   async delete<T>(path: string): Promise<T> {
@@ -138,7 +162,7 @@ class ApiClient {
       method: 'DELETE',
       headers: this.getHeaders(),
     });
-    return this.handleResponse<T>(res);
+    return this.handleResponse<T>(res, path);
   }
 }
 

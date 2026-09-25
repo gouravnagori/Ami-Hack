@@ -164,11 +164,24 @@ class Settings(BaseSettings):
     CO2E_PER_KG: float = 2.5
     PORTION_KG: float = 0.4
 
-    # AI Feature Flags
-    AGENT_ENABLED: bool = False
-    LLM_PARSE_MODEL: str = "gemini-1.5-flash"
-    LLM_AGENT_MODEL: str = "gemini-1.5-pro"
+    # AI Feature Flags & Groq Configuration
+    GROQ_API_KEY: str = ""
+    GROQ_MODEL: str = "llama-3.3-70b-versatile"
+    GROQ_FAST_MODEL: str = "llama-3.1-8b-instant"
+    AGENT_ENABLED: bool = True
+    LLM_PARSE_MODEL: str = "llama-3.3-70b-versatile"
+    LLM_AGENT_MODEL: str = "llama-3.3-70b-versatile"
     LLM_API_KEY: str = ""
+
+    # SMTP Email Configuration
+    SMTP_ENABLED: bool = False
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = "noreply@goldenhour.app"
+    SMTP_FROM_NAME: str = "GoldenHour Food Rescue"
+    SMTP_USE_TLS: bool = True
 
     # Chaos Injection Flags
     CHAOS_OSRM_DOWN: bool = False

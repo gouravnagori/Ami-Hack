@@ -28,10 +28,10 @@ export const DonorLayout: React.FC = () => {
             <span style={{ fontSize: '20px' }}>🍲</span>
             <div>
               <strong style={{ fontSize: '1rem', color: 'var(--deep)' }}>
-                {user?.profile?.org_name || user?.name || 'Spice Route Kitchen'}
+                {user?.profile?.org_name || user?.name || 'Food Donor'}
               </strong>
               <div style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>
-                {user?.profile?.pickup_address || user?.city || 'Jaipur'} • {user?.profile?.food_category || 'Donor Hub'}
+                {user?.profile?.pickup_address || user?.city || user?.email || 'Donor Hub'}
               </div>
             </div>
           </div>

@@ -2,14 +2,18 @@
 import { useState, useEffect, useRef } from 'react';
 
 export function useCountUp(target: number, duration = 600): number {
-  const [value, setValue] = useState(target);
-  const prevRef = useRef(target);
+  const safeTarget = typeof target === 'number' && Number.isFinite(target) ? target : 0;
+  const [value, setValue] = useState(safeTarget);
+  const prevRef = useRef(safeTarget);
   const rafRef = useRef<number>(0);
 
   useEffect(() => {
-    const from = prevRef.current;
-    const to = target;
-    if (from === to) return;
+    const to = typeof target === 'number' && Number.isFinite(target) ? target : 0;
+    const from = typeof prevRef.current === 'number' && Number.isFinite(prevRef.current) ? prevRef.current : 0;
+    if (from === to) {
+      setValue(to);
+      return;
+    }
 
     const start = performance.now();
     const animate = (time: number) => {
@@ -18,7 +22,7 @@ export function useCountUp(target: number, duration = 600): number {
       // ease-out quad
       const eased = 1 - (1 - progress) * (1 - progress);
       const current = Math.round(from + (to - from) * eased);
-      setValue(current);
+      setValue(Number.isFinite(current) ? current : to);
 
       if (progress < 1) {
         rafRef.current = requestAnimationFrame(animate);

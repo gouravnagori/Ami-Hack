@@ -13,13 +13,28 @@ export const DonorHome: React.FC = () => {
   const navigate = useNavigate();
   const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [impact, setImpact] = useState<{ meals_rescued: number; weight_kg: number; co2e_kg: number; on_time_rate: number }>({ meals_rescued: 0, weight_kg: 0, co2e_kg: 0, on_time_rate: 1 });
 
   useEffect(() => {
     api
-      .get<{ items: Donation[] }>('/api/donations')
-      .then((res) => setDonations(res.items))
+      .get<{ items: Donation[] }>('/donations')
+      .then((res) => setDonations(res.items || []))
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
+    api
+      .get<{ meals_rescued?: number; weight_kg?: number; co2e_kg?: number; co2e_kg_avoided?: number; on_time_rate?: number }>('/donor/impact')
+      .then((res) => {
+        if (res) {
+          const co2 = res.co2e_kg ?? res.co2e_kg_avoided ?? 0;
+          setImpact({
+            meals_rescued: Number.isFinite(res.meals_rescued) ? Number(res.meals_rescued) : 0,
+            weight_kg: Number.isFinite(res.weight_kg) ? Number(res.weight_kg) : 0,
+            co2e_kg: Number.isFinite(co2) ? Number(co2) : 0,
+            on_time_rate: Number.isFinite(res.on_time_rate) ? Number(res.on_time_rate) : 1,
+          });
+        }
+      })
+      .catch(() => {});
   }, []);
 
   return (
@@ -33,10 +48,10 @@ export const DonorHome: React.FC = () => {
           marginBottom: '28px',
         }}
       >
-        <MetricCard label="Portions Rescued This Month" value={1420} sub="from 28 donations" variant="default" />
-        <MetricCard label="Active Posts in Flight" value={donations.length} sub="Jaipur Corridor" variant="blue" />
-        <MetricCard label="CO2e Emissions Diverted" value={1240} format={(n) => `${n} kg`} sub="Zero waste tier" variant="default" />
-        <MetricCard label="On-Time Delivery Success" value={98.5} format={(n) => `${n}%`} sub="Avg slack 42 mins" variant="default" />
+        <MetricCard label="Portions Rescued" value={Number.isFinite(impact.meals_rescued) ? impact.meals_rescued : 0} sub="from your donations" variant="default" />
+        <MetricCard label="Active Donations" value={donations.length} sub="in flight" variant="blue" />
+        <MetricCard label="CO2e Diverted" value={Number.isFinite(impact.co2e_kg) ? impact.co2e_kg : 0} format={(n) => `${Math.round(Number.isFinite(n) ? n : 0)} kg`} sub="emissions prevented" variant="default" />
+        <MetricCard label="On-Time Rate" value={(Number.isFinite(impact.on_time_rate) ? impact.on_time_rate : 1) * 100} format={(n) => `${(Number.isFinite(n) ? n : 100).toFixed(1)}%`} sub="delivery success" variant="default" />
       </div>
 
       {/* Quick Action Banner */}
@@ -68,12 +83,12 @@ export const DonorHome: React.FC = () => {
         </div>
 
         <Button variant="primary" size="lg" arrow onClick={() => navigate('/donor/new')}>
-          Quick Post (AI)
+          Quick Post
         </Button>
       </div>
 
       {/* Active Donations Section */}
-      <div style={{ marginBottom: '20px' }}>
+      <div style={{ marginBottom: '24px' }}>
         <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--deep)', marginBottom: '14px' }}>
           Active Food Posts ({donations.length})
         </h4>
@@ -81,6 +96,45 @@ export const DonorHome: React.FC = () => {
         {loading ? (
           <div style={{ padding: '40px', textAlign: 'center', color: 'var(--muted)' }}>
             Loading active donations...
+          </div>
+        ) : donations.length === 0 ? (
+          <div
+            style={{
+              background: 'var(--white)',
+              border: '1px dashed var(--line)',
+              borderRadius: 'var(--r-card-lg)',
+              padding: '48px 24px',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <div
+              style={{
+                width: '52px',
+                height: '52px',
+                borderRadius: '50%',
+                background: 'var(--paper)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.5rem',
+                marginBottom: '14px',
+              }}
+            >
+              🍲
+            </div>
+            <h5 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--deep)', margin: '0 0 6px' }}>
+              No Active Food Posts
+            </h5>
+            <p style={{ color: 'var(--muted)', fontSize: '0.88rem', maxWidth: '420px', margin: '0 0 18px', lineHeight: 1.5 }}>
+              Your kitchen has no active surplus posts right now. When you post surplus portions, real-time matching, safe-slack countdowns, and live transit trackers will appear here.
+            </p>
+            <Button variant="outline" size="sm" onClick={() => navigate('/donor/new')}>
+              + Create Food Post
+            </Button>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

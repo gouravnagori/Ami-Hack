@@ -31,7 +31,7 @@ export const OrgLayout: React.FC = () => {
                 {user?.profile?.name || user?.name || 'Asha Shelter Foundation'}
               </strong>
               <div style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>
-                {user?.profile?.address || user?.city || 'Jaipur'} • Capacity Hub
+                {user?.profile?.address || user?.city || user?.email || 'Capacity Hub'}
               </div>
             </div>
           </div>

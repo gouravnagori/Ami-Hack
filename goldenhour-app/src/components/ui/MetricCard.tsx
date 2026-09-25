@@ -21,8 +21,24 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   wide = false,
   className = '',
 }) => {
-  const tweened = useCountUp(value);
-  const display = format ? format(tweened) : tweened.toString();
+  const safeValue = typeof value === 'number' && Number.isFinite(value) ? value : 0;
+  const tweened = useCountUp(safeValue);
+  const safeTweened = typeof tweened === 'number' && Number.isFinite(tweened) ? tweened : safeValue;
+
+  let display: string;
+  if (format) {
+    try {
+      display = format(safeTweened);
+    } catch {
+      display = safeTweened.toString();
+    }
+  } else {
+    display = safeTweened.toString();
+  }
+
+  if (display.includes('NaN')) {
+    display = display.replace(/NaN/g, '0');
+  }
 
   return (
     <div className={`${styles.card} ${styles[variant]} ${wide ? styles.wide : ''} ${className}`}>

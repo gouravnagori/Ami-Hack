@@ -1,12 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Toggle } from '../../../components/ui/Toggle';
 import { Button } from '../../../components/ui/Button';
 import { MetricCard } from '../../../components/ui/MetricCard';
+import { api } from '../../../lib/api';
 
 export const DriverHome: React.FC = () => {
   const navigate = useNavigate();
-  const [online, setOnline] = useState(true);
+  const [online, setOnline] = useState(false);
+  const [driverStatus, setDriverStatus] = useState<{ shift_hours: number; completed_today: number }>({ shift_hours: 0, completed_today: 0 });
+
+  useEffect(() => {
+    api.get<{ status: string; shift_hours: number; completed_today: number }>('/driver/status')
+      .then((res) => {
+        setOnline(res.status === 'available' || res.status === 'on_task');
+        setDriverStatus({ shift_hours: res.shift_hours, completed_today: res.completed_today });
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleToggleStatus = (checked: boolean) => {
+    setOnline(checked);
+    api.post('/driver/status', { status: checked ? 'available' : 'offline' }).catch(() => {});
+  };
 
   return (
     <div>
@@ -33,13 +49,13 @@ export const DriverHome: React.FC = () => {
           </span>
         </div>
 
-        <Toggle checked={online} onChange={setOnline} />
+        <Toggle checked={online} onChange={handleToggleStatus} />
       </div>
 
       {/* Today's Shift Metrics */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
-        <MetricCard label="Today's Honorarium" value={620} format={(n) => `₹${n}`} sub="Disbursed daily" variant="default" />
-        <MetricCard label="Portions Rescued" value={185} sub="4 completed routes" variant="blue" />
+        <MetricCard label="Shift Hours" value={driverStatus.shift_hours} format={(n) => `${n.toFixed(1)}h`} sub="today" variant="default" />
+        <MetricCard label="Routes Completed" value={driverStatus.completed_today} sub="today" variant="blue" />
       </div>
 
       {/* Active Route CTA Banner */}

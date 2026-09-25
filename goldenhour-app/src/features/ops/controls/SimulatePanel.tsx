@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { api } from '../../../lib/api';
-import { runChaosAction, SCENARIOS } from '../../../mocks/scenarios';
 import { useUiStore } from '../../../store/ui';
 import type { SimScenario, ChaosKind } from '../../../types/api';
+
+// Scenario metadata — display-only, no mock logic
+const SCENARIOS: Record<SimScenario, { name: string; description: string }> = {
+  normal: { name: 'Normal Operations', description: 'Standard evening surplus flow across corridors.' },
+  wedding_night: { name: 'Wedding Night Surge', description: 'High-volume catering surplus from multiple banquet venues.' },
+  rush_hour: { name: 'Rush Hour Stress', description: 'Peak traffic congestion with tight delivery windows.' },
+};
 
 export const SimulatePanel: React.FC = () => {
   const { addToast } = useUiStore();
@@ -13,23 +19,22 @@ export const SimulatePanel: React.FC = () => {
     setCurrentScenario(scenario);
     setLoading(true);
     try {
-      await api.post('/api/admin/simulate', { scenario });
+      await api.post('/admin/simulate', { scenario });
       addToast(`Scenario activated: ${SCENARIOS[scenario].name}`, 'success');
     } catch {
-      addToast('Scenario switch simulated locally', 'info');
+      addToast('Failed to activate scenario on backend', 'error');
     } finally {
       setLoading(false);
     }
   };
 
   const handleInjectChaos = async (kind: ChaosKind) => {
-    runChaosAction(kind);
     try {
-      await api.post('/api/admin/chaos', { kind });
+      await api.post('/admin/chaos', { kind });
+      addToast(`Chaos Injected: ${kind.replace('_', ' ').toUpperCase()}`, 'warning');
     } catch {
-      // Local fallback handled by runChaosAction
+      addToast('Failed to inject chaos on backend', 'error');
     }
-    addToast(`Chaos Injected: ${kind.replace('_', ' ').toUpperCase()}`, 'warning');
   };
 
   return (
@@ -44,7 +49,7 @@ export const SimulatePanel: React.FC = () => {
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
         <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--deep)', margin: 0 }}>
-          🎮 Jaipur Simulation & Stress Testing
+          🎮 Simulation & Stress Testing
         </h4>
         <span style={{ fontSize: '0.72rem', background: 'var(--soft)', color: 'var(--deep)', padding: '2px 8px', borderRadius: 'var(--r-pill)', fontWeight: 700 }}>
           Active

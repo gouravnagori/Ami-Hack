@@ -17,6 +17,18 @@ class RegisterRequest(SchemaBase):
     locale: str = Field(default="en", max_length=10)
     city: str = Field(default="Jaipur", max_length=100)
     avatar_url: str | None = None
+    otp: str | None = None
+
+
+class SendOtpRequest(SchemaBase):
+    email: EmailStr
+    purpose: str = "login"  # "login" | "register"
+    name: str | None = None
+
+
+class LoginOtpRequest(SchemaBase):
+    email: EmailStr
+    otp: str = Field(..., min_length=4, max_length=10)
 
 
 class ProfileUpdateRequest(SchemaBase):

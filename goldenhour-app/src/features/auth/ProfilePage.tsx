@@ -77,32 +77,6 @@ export const ProfilePage: React.FC = () => {
     }
   };
 
-  const handleDemoSignIn = async (role: Role) => {
-    setLoading(true);
-    try {
-      const tokens = await api.post<{
-        access_token: string;
-        refresh_token: string;
-        token_type: string;
-        expires_in: number;
-        user_id: string;
-        role: Role;
-      }>('/auth/demo', { role });
-
-      useSessionStore.getState().setTokens(tokens.access_token, tokens.refresh_token);
-      const freshUser = await api.get<User>('/auth/me');
-      setSession(freshUser, {
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-      });
-      addToast(`Signed in as Demo ${role.toUpperCase()}!`, 'success');
-    } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Demo sign in failed';
-      addToast(errorMsg, 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getDashboardPath = () => {
     if (!user) return '/';
@@ -165,53 +139,13 @@ export const ProfilePage: React.FC = () => {
             Please sign in to access your profile, view role credentials, and update operating details.
           </p>
 
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginBottom: '28px' }}>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
             <Button variant="primary" onClick={() => navigate('/auth')}>
-              Sign In
+              Sign In to Your Account
             </Button>
             <Button variant="outline" onClick={() => navigate('/auth?mode=register')}>
-              Create Account
+              Create New Account
             </Button>
-          </div>
-
-          <div style={{ borderTop: '1px solid var(--line)', paddingTop: '20px' }}>
-            <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--muted)', marginBottom: '12px', fontWeight: 700 }}>
-              Or launch instant demo profile:
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-              <button
-                type="button"
-                onClick={() => handleDemoSignIn('donor')}
-                disabled={loading}
-                style={demoBtnStyle}
-              >
-                <span>🍲 Donor</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleDemoSignIn('recipient')}
-                disabled={loading}
-                style={demoBtnStyle}
-              >
-                <span>🏠 Shelter</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleDemoSignIn('driver')}
-                disabled={loading}
-                style={demoBtnStyle}
-              >
-                <span>🛵 Driver</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleDemoSignIn('admin')}
-                disabled={loading}
-                style={demoBtnStyle}
-              >
-                <span>⚡ Ops</span>
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -692,17 +626,4 @@ const inputStyle: React.CSSProperties = {
   outline: 'none',
   fontFamily: 'inherit',
   transition: 'border-color 0.2s ease',
-};
-
-const demoBtnStyle: React.CSSProperties = {
-  padding: '10px',
-  borderRadius: 'var(--r-card-sm)',
-  border: '1px solid var(--line)',
-  background: 'var(--paper)',
-  fontSize: '0.86rem',
-  fontWeight: 600,
-  color: 'var(--deep)',
-  cursor: 'pointer',
-  textAlign: 'center',
-  transition: 'all 0.2s ease',
 };

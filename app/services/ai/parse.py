@@ -133,3 +133,8 @@ def parse_donation_text(
         "confidence": confidence,
         "missing": missing,
     }
+
+
+# Export alias
+heuristic_parse_donation = parse_donation_text
+

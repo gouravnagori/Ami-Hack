@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../../lib/api';
-import { mockWsBus } from '../../mocks/ws';
+import { liveSocket } from '../../lib/ws';
 import type { AdminLiveSnapshot, AdminMetrics, WsMessage } from '../../types/api';
 import { RouteMap } from '../../components/domain/RouteMap';
 import { SimulatePanel } from './controls/SimulatePanel';
@@ -17,9 +17,7 @@ export const OpsConsole: React.FC = () => {
   const [snapshot, setSnapshot] = useState<AdminLiveSnapshot | null>(null);
   const [metrics, setMetrics] = useState<AdminMetrics | null>(null);
   const [logs, setLogs] = useState<EventLogEntry[]>([
-    { id: '1', time: '17:28:10', text: 'Jaipur Ops Control initialized. 3 drivers active in C-Scheme corridor.', type: 'info' },
-    { id: '2', time: '17:28:22', text: 'Offer accepted: 45 portions from Spice Route ➔ Asha Shelter.', type: 'success' },
-    { id: '3', time: '17:28:45', text: 'Driver Rajesh Kumar en-route to Stop #1. Safe slack: 42 mins.', type: 'info' },
+    { id: '0', time: new Date().toLocaleTimeString(), text: 'Ops Console initialized. Waiting for live events…', type: 'info' },
   ]);
 
   useEffect(() => {
@@ -35,7 +33,7 @@ export const OpsConsole: React.FC = () => {
       .catch((err) => console.error(err));
 
     // Listen to live WebSocket events
-    const unsub = mockWsBus.subscribe((msg: WsMessage) => {
+    const unsub = liveSocket.subscribe((msg: WsMessage) => {
       const timeStr = new Date(msg.ts).toLocaleTimeString();
       let newLog: EventLogEntry | null = null;
 
