@@ -47,6 +47,25 @@ class ApiClient {
     return res.json();
   }
 
+  private resolveUrl(path: string): string {
+    const base = (BASE_URL || '/api/v1').replace(/\/+$/, '');
+    let p = path.trim();
+    if (!p.startsWith('/')) {
+      p = '/' + p;
+    }
+    // Prevent double prefixing when path has /api/v1/ or /api/
+    if (base.endsWith('/api/v1') && p.startsWith('/api/v1/')) {
+      p = p.slice(7);
+    } else if (base.endsWith('/api/v1') && p.startsWith('/api/')) {
+      p = p.slice(4);
+    }
+
+    if (base.startsWith('http://') || base.startsWith('https://')) {
+      return `${base}${p}`;
+    }
+    return `${window.location.origin}${base}${p}`;
+  }
+
   private async tryRefresh(): Promise<void> {
     if (this.refreshPromise) return this.refreshPromise;
 
@@ -54,11 +73,13 @@ class ApiClient {
       const refreshToken = useSessionStore.getState().refreshToken;
       if (!refreshToken) {
         useSessionStore.getState().logout();
+        // Redirect to login
+        window.location.href = '/auth';
         return;
       }
 
       try {
-        const res = await fetch(`${BASE_URL}/auth/refresh`, {
+        const res = await fetch(this.resolveUrl('/auth/refresh'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refresh_token: refreshToken }),
@@ -66,6 +87,8 @@ class ApiClient {
 
         if (!res.ok) {
           useSessionStore.getState().logout();
+          // Redirect to login when refresh fails
+          window.location.href = '/auth';
           return;
         }
 
@@ -73,6 +96,7 @@ class ApiClient {
         useSessionStore.getState().setTokens(data.access_token, data.refresh_token);
       } catch {
         useSessionStore.getState().logout();
+        window.location.href = '/auth';
       } finally {
         this.refreshPromise = null;
       }
@@ -82,7 +106,8 @@ class ApiClient {
   }
 
   async get<T>(path: string, params?: Record<string, string>): Promise<T> {
-    const url = new URL(`${BASE_URL}${path}`, window.location.origin);
+    const resolved = this.resolveUrl(path);
+    const url = new URL(resolved);
     if (params) {
       Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
     }
@@ -91,7 +116,7 @@ class ApiClient {
   }
 
   async post<T>(path: string, body?: unknown): Promise<T> {
-    const res = await fetch(`${BASE_URL}${path}`, {
+    const res = await fetch(this.resolveUrl(path), {
       method: 'POST',
       headers: this.getHeaders(true),
       body: body ? JSON.stringify(body) : undefined,
@@ -100,7 +125,7 @@ class ApiClient {
   }
 
   async put<T>(path: string, body?: unknown): Promise<T> {
-    const res = await fetch(`${BASE_URL}${path}`, {
+    const res = await fetch(this.resolveUrl(path), {
       method: 'PUT',
       headers: this.getHeaders(),
       body: body ? JSON.stringify(body) : undefined,
@@ -109,7 +134,7 @@ class ApiClient {
   }
 
   async delete<T>(path: string): Promise<T> {
-    const res = await fetch(`${BASE_URL}${path}`, {
+    const res = await fetch(this.resolveUrl(path), {
       method: 'DELETE',
       headers: this.getHeaders(),
     });

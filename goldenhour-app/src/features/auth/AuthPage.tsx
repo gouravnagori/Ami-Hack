@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useSessionStore } from '../../store/session';
 import { useUiStore } from '../../store/ui';
 import { api } from '../../lib/api';
 import { Button } from '../../components/ui/Button';
-import type { Role, User, AuthTokens } from '../../types/api';
+import type { Role, User } from '../../types/api';
+import { RegistrationForm } from './RegistrationForm';
 
 export const AuthPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const initialRole = (searchParams.get('role') as Role) || 'donor';
 
+  const [mode, setMode] = useState<'login' | 'register'>('login');
   const [role, setRole] = useState<Role>(initialRole);
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,19 +21,51 @@ export const AuthPage: React.FC = () => {
   const { setSession } = useSessionStore();
   const { addToast } = useUiStore();
 
+  // If a 'role' param is present and comes from an AuthGuard redirect,
+  // auto-trigger demo login immediately so UX is seamless
+  useEffect(() => {
+    const fromGuard = (location.state as { from?: string } | null)?.from;
+    const roleParam = searchParams.get('role') as Role | null;
+    if (roleParam && fromGuard) {
+      // Auto-login with the hinted role
+      handleLogin(roleParam);
+    }
+    // Only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleLogin = async (selectedRole: Role) => {
     setLoading(true);
     try {
-      const data = await api.post<{ user: User; tokens: AuthTokens }>('/api/auth/login', {
+      // 1. Authenticate via /auth/demo
+      const tokens = await api.post<{
+        access_token: string;
+        refresh_token: string;
+        token_type: string;
+        expires_in: number;
+        user_id: string;
+        role: Role;
+      }>('/auth/demo', {
         role: selectedRole,
-        email: email || undefined,
       });
 
-      setSession(data.user, data.tokens);
-      addToast(`Welcome back, ${data.user.name}!`, 'success');
+      // Set tokens in session store so subsequent requests include Authorization header
+      useSessionStore.getState().setTokens(tokens.access_token, tokens.refresh_token);
 
-      // Navigate to role-specific dashboard
-      if (selectedRole === 'donor') navigate('/donor');
+      // 2. Fetch authenticated user profile
+      const user = await api.get<User>('/auth/me');
+
+      setSession(user, {
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+      });
+      addToast(`Welcome back, ${user.name}!`, 'success');
+
+      // Navigate back to where the user was trying to go, or to their dashboard
+      const from = (location.state as { from?: string } | null)?.from;
+      if (from) {
+        navigate(from, { replace: true });
+      } else if (selectedRole === 'donor') navigate('/donor');
       else if (selectedRole === 'recipient') navigate('/org');
       else if (selectedRole === 'driver') navigate('/driver');
       else navigate('/ops');
@@ -40,6 +75,16 @@ export const AuthPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRegistrationSuccess = (selectedRole: Role) => {
+    const from = (location.state as { from?: string } | null)?.from;
+    if (from) {
+      navigate(from, { replace: true });
+    } else if (selectedRole === 'donor') navigate('/donor');
+    else if (selectedRole === 'recipient') navigate('/org');
+    else if (selectedRole === 'driver') navigate('/driver');
+    else navigate('/ops');
   };
 
   return (
@@ -129,46 +174,59 @@ export const AuthPage: React.FC = () => {
           })}
         </div>
 
-        {/* Email or Phone field */}
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--deep)', marginBottom: '6px' }}>
-            Email or Registered Phone
-          </label>
-          <input
-            type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="e.g. contact@spiceroutejaipur.com"
-            style={{
-              width: '100%',
-              padding: '12px 14px',
-              borderRadius: 'var(--r-card-sm)',
-              border: '1px solid var(--line)',
-              background: 'var(--paper)',
-              fontSize: '0.95rem',
-              color: 'var(--ink)',
-              outline: 'none',
-            }}
-          />
-        </div>
+        {mode === 'login' ? (
+          <>
+            {/* Email or Phone field */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--deep)', marginBottom: '6px' }}>
+                Email or Registered Phone
+              </label>
+              <input
+                type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="e.g. contact@spiceroutejaipur.com"
+                style={{
+                  width: '100%',
+                  padding: '12px 14px',
+                  borderRadius: 'var(--r-card-sm)',
+                  border: '1px solid var(--line)',
+                  background: 'var(--paper)',
+                  fontSize: '0.95rem',
+                  color: 'var(--ink)',
+                  outline: 'none',
+                }}
+              />
+            </div>
 
-        {/* Login Button */}
-        <Button
-          variant="primary"
-          size="lg"
-          block
-          arrow
-          onClick={() => handleLogin(role)}
-          disabled={loading}
-        >
-          {loading ? 'Entering...' : `Enter as ${role.toUpperCase()}`}
-        </Button>
+            {/* Login Button */}
+            <Button
+              variant="primary"
+              size="lg"
+              block
+              arrow
+              onClick={() => handleLogin(role)}
+              disabled={loading}
+            >
+              {loading ? 'Entering...' : `Enter as ${role.toUpperCase()}`}
+            </Button>
+            
+            <div style={{ marginTop: '16px', textAlign: 'center' }}>
+              <span style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>New here? </span>
+              <button 
+                type="button" 
+                onClick={() => setMode('register')}
+                style={{ background: 'none', border: 'none', color: 'var(--green-dark)', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem' }}
+              >
+                Sign up instead
+              </button>
+            </div>
 
-        {/* Quick Demo Logins Section */}
-        <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
-          <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--muted)', marginBottom: '12px', textAlign: 'center', fontWeight: 700 }}>
-            Instant Hackathon Demo Logins (Jaipur)
-          </div>
+            {/* Quick Demo Logins Section */}
+            <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
+              <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--muted)', marginBottom: '12px', textAlign: 'center', fontWeight: 700 }}>
+                Instant Hackathon Demo Logins (Jaipur)
+              </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <button
@@ -248,6 +306,14 @@ export const AuthPage: React.FC = () => {
             </button>
           </div>
         </div>
+      </>
+    ) : (
+      <RegistrationForm 
+        role={role} 
+        onSuccess={handleRegistrationSuccess} 
+        onCancel={() => setMode('login')} 
+      />
+    )}
       </div>
     </div>
   );

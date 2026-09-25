@@ -22,8 +22,12 @@ from app.db.models.user import User
 from app.schemas.auth import (
     DemoLoginRequest,
     LoginRequest,
+    ProfileUpdateRequest,
     RegisterRequest,
     TokenRefreshRequest,
+    TokenResponse,
+    UserResponse,
+)
     TokenResponse,
     UserResponse,
 )
@@ -72,6 +76,8 @@ async def register(
         email=str(req.email) if req.email else None,
         password_hash=hash_password(req.password),
         locale=req.locale,
+        city=req.city,
+        avatar_url=req.avatar_url,
     )
     db.add(user)
     await db.flush()
@@ -88,6 +94,10 @@ async def register(
             lng=float(profile_data.get("lng", settings.SEED_CENTER_LNG)),
             fssai_no=profile_data.get("fssai_no"),
             default_pickup_window=profile_data.get("default_pickup_window"),
+            pickup_address=profile_data.get("pickup_address"),
+            food_category=profile_data.get("food_category"),
+            contact_person=profile_data.get("contact_person"),
+            operating_hours=profile_data.get("operating_hours"),
         )
         db.add(donor)
     elif req.role == Role.RECIPIENT:
@@ -103,6 +113,11 @@ async def register(
             cold_max_units=int(profile_data.get("cold_max_units", 20)),
             service_rate_per_hour=float(profile_data.get("service_rate_per_hour", 30.0)),
             need_level=float(profile_data.get("need_level", 0.7)),
+            contact_person=profile_data.get("contact_person"),
+            contact_phone=profile_data.get("contact_phone"),
+            max_capacity_portions=int(profile_data.get("max_capacity_portions", 150)),
+            food_restrictions=profile_data.get("food_restrictions"),
+            receiving_hours=profile_data.get("receiving_hours"),
         )
         db.add(recipient)
     elif req.role == Role.DRIVER:
@@ -113,6 +128,8 @@ async def register(
             has_cold_box=bool(profile_data.get("has_cold_box", False)),
             lat=float(profile_data.get("lat", settings.SEED_CENTER_LAT)),
             lng=float(profile_data.get("lng", settings.SEED_CENTER_LNG)),
+            vehicle_number=profile_data.get("vehicle_number"),
+            operating_area=profile_data.get("operating_area"),
         )
         db.add(driver)
 
@@ -252,6 +269,12 @@ async def get_me(
             "address": current_user.donor_profile.address,
             "lat": current_user.donor_profile.lat,
             "lng": current_user.donor_profile.lng,
+            "fssai_no": current_user.donor_profile.fssai_no,
+            "default_pickup_window": current_user.donor_profile.default_pickup_window,
+            "pickup_address": current_user.donor_profile.pickup_address,
+            "food_category": current_user.donor_profile.food_category,
+            "contact_person": current_user.donor_profile.contact_person,
+            "operating_hours": current_user.donor_profile.operating_hours,
         }
     elif current_user.role == Role.RECIPIENT and current_user.recipient_profile:
         profile_dict = {
@@ -261,6 +284,12 @@ async def get_me(
             "lng": current_user.recipient_profile.lng,
             "accepts_diets": current_user.recipient_profile.accepts_diets,
             "cold_max_units": current_user.recipient_profile.cold_max_units,
+            "fssai_reg_no": current_user.recipient_profile.fssai_reg_no,
+            "contact_person": current_user.recipient_profile.contact_person,
+            "contact_phone": current_user.recipient_profile.contact_phone,
+            "max_capacity_portions": current_user.recipient_profile.max_capacity_portions,
+            "food_restrictions": current_user.recipient_profile.food_restrictions,
+            "receiving_hours": current_user.recipient_profile.receiving_hours,
         }
     elif current_user.role == Role.DRIVER and current_user.driver_profile:
         profile_dict = {
@@ -268,6 +297,8 @@ async def get_me(
             "capacity_portions": current_user.driver_profile.capacity_portions,
             "has_cold_box": current_user.driver_profile.has_cold_box,
             "status": current_user.driver_profile.status,
+            "vehicle_number": current_user.driver_profile.vehicle_number,
+            "operating_area": current_user.driver_profile.operating_area,
         }
 
     return UserResponse(
@@ -279,5 +310,43 @@ async def get_me(
         email=current_user.email,
         is_active=current_user.is_active,
         locale=current_user.locale,
+        city=current_user.city,
+        avatar_url=current_user.avatar_url,
         profile=profile_dict,
     )
+
+@router.put("/me", response_model=UserResponse)
+async def update_me(
+    req: ProfileUpdateRequest,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    # Update base user fields
+    if req.name is not None:
+        current_user.name = req.name
+    if req.email is not None:
+        current_user.email = str(req.email)
+    if req.city is not None:
+        current_user.city = req.city
+    if req.avatar_url is not None:
+        current_user.avatar_url = req.avatar_url
+
+    # Update profile fields
+    if req.profile:
+        if current_user.role == Role.DONOR and current_user.donor_profile:
+            for k, v in req.profile.items():
+                if hasattr(current_user.donor_profile, k):
+                    setattr(current_user.donor_profile, k, v)
+        elif current_user.role == Role.RECIPIENT and current_user.recipient_profile:
+            for k, v in req.profile.items():
+                if hasattr(current_user.recipient_profile, k):
+                    setattr(current_user.recipient_profile, k, v)
+        elif current_user.role == Role.DRIVER and current_user.driver_profile:
+            for k, v in req.profile.items():
+                if hasattr(current_user.driver_profile, k):
+                    setattr(current_user.driver_profile, k, v)
+
+    await db.commit()
+    await db.refresh(current_user)
+
+    return await get_me(current_user=current_user)

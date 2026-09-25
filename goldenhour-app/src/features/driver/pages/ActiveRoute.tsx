@@ -17,9 +17,12 @@ export const ActiveRoute: React.FC = () => {
 
   useEffect(() => {
     api
-      .get<Route>('/api/routes/active')
+      .get<Route>('/driver/route')
       .then(setRoute)
-      .catch((err) => console.error(err));
+      .catch(() => {
+        // Fallback to /routes/active if needed
+        api.get<Route>('/routes/active').then(setRoute).catch(console.error);
+      });
   }, []);
 
   if (!route) {
@@ -38,7 +41,7 @@ export const ActiveRoute: React.FC = () => {
 
     setConfirming(true);
     try {
-      await api.post(`/api/routes/${route.id}/stops/${currentStop.id}/done`, {
+      await api.post(`/stops/${currentStop.id}/complete`, {
         otp: otpInput,
       });
 

@@ -210,6 +210,9 @@ export interface User {
   name: string;
   email?: string;
   phone?: string;
+  city?: string;
+  avatar_url?: string;
+  profile?: Record<string, any>;
 }
 
 export interface AuthTokens {

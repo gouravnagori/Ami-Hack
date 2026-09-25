@@ -19,6 +19,9 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     locale: Mapped[str] = mapped_column(String(10), default="en", nullable=False)
+    city: Mapped[str] = mapped_column(String(100), default="Jaipur", nullable=False)
+    avatar_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    admin_team: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     # Relationships
     donor_profile: Mapped["Donor | None"] = relationship(

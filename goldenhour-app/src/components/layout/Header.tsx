@@ -122,7 +122,7 @@ export const Header: React.FC = () => {
               {rolesMenuOpen && (
                 <div className={styles.rolesMenu}>
                   <Link
-                    to="/donor"
+                    to="/auth?role=donor"
                     className={styles.rolesMenuItem}
                     onClick={() => setRolesMenuOpen(false)}
                   >
@@ -134,7 +134,7 @@ export const Header: React.FC = () => {
                   </Link>
 
                   <Link
-                    to="/org"
+                    to="/auth?role=recipient"
                     className={styles.rolesMenuItem}
                     onClick={() => setRolesMenuOpen(false)}
                   >
@@ -146,7 +146,7 @@ export const Header: React.FC = () => {
                   </Link>
 
                   <Link
-                    to="/driver"
+                    to="/auth?role=driver"
                     className={styles.rolesMenuItem}
                     onClick={() => setRolesMenuOpen(false)}
                   >
@@ -158,7 +158,7 @@ export const Header: React.FC = () => {
                   </Link>
 
                   <Link
-                    to="/ops"
+                    to="/auth?role=admin"
                     className={`${styles.rolesMenuItem} ${styles.opsMenuItem}`}
                     onClick={() => setRolesMenuOpen(false)}
                   >
@@ -174,7 +174,9 @@ export const Header: React.FC = () => {
 
             {user ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span className={styles.userBadge}>{user.name}</span>
+                <Link to="/profile" className={styles.userBadge} style={{ textDecoration: 'none' }}>
+                  {user.name}
+                </Link>
                 <Button
                   variant="outline"
                   size="sm"

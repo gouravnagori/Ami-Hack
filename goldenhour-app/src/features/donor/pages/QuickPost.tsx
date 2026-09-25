@@ -43,12 +43,24 @@ export const QuickPost: React.FC = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
+      const now = new Date().toISOString();
       const safeUntil = new Date(Date.now() + safeHours * 3600 * 1000).toISOString();
       const newDonation = await api.post<Donation>('/api/donations', {
         total_portions: portions,
         diet,
         storage,
+        category: 'cooked_meals',
+        prepared_at: now,
         safe_until: safeUntil,
+        pickup_window: {
+          start: now,
+          end: safeUntil,
+        },
+        pickup: {
+          lat: 26.9085,
+          lng: 75.8012,
+          address: 'Spice Route Kitchen, C-Scheme, Jaipur',
+        },
         notes,
         items: [{ name: naturalText.slice(0, 35) || 'Fresh Meal Surplus', portions }],
       });

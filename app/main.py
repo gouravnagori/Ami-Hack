@@ -9,6 +9,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.v1.health import router as health_router
 from app.api.v1.router import api_v1_router
+from app.api.v1.ws import router as ws_router
 from app.core.config import settings
 from app.core.errors import (
     AppException,
@@ -83,6 +84,9 @@ def create_app() -> FastAPI:
 
     # Mount base health routes
     app.include_router(health_router)
+
+    # Mount base websocket route (/ws)
+    app.include_router(ws_router)
 
     # Mount API v1 router
     app.include_router(api_v1_router, prefix=settings.API_V1_PREFIX)

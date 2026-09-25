@@ -15,6 +15,16 @@ class RegisterRequest(SchemaBase):
     password: str = Field(..., min_length=6, max_length=128)
     profile: dict[str, Any] = Field(default_factory=dict)
     locale: str = Field(default="en", max_length=10)
+    city: str = Field(default="Jaipur", max_length=100)
+    avatar_url: str | None = None
+
+
+class ProfileUpdateRequest(SchemaBase):
+    name: str | None = None
+    email: EmailStr | None = None
+    city: str | None = None
+    avatar_url: str | None = None
+    profile: dict[str, Any] | None = None
 
 
 class LoginRequest(SchemaBase):
@@ -48,4 +58,6 @@ class UserResponse(SchemaBase):
     email: str | None = None
     is_active: bool
     locale: str
+    city: str | None = None
+    avatar_url: str | None = None
     profile: dict[str, Any] | None = None

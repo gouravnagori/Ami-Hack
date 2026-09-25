@@ -14,12 +14,13 @@ export const OrgHome: React.FC = () => {
 
   useEffect(() => {
     Promise.all([
-      api.get<CapacitySnapshot>('/api/capacity/current'),
-      api.get<{ items: Offer[] }>('/api/offers'),
+      api.get<CapacitySnapshot>('/org/capacity'),
+      api.get<Offer[] | { items: Offer[] }>('/offers'),
     ])
       .then(([capRes, offRes]) => {
         setCapacity(capRes);
-        setOffers(offRes.items.filter((o) => o.kind === 'recipient'));
+        const list = Array.isArray(offRes) ? offRes : (offRes?.items || []);
+        setOffers(list.filter((o) => o.kind === 'recipient'));
       })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
@@ -28,7 +29,7 @@ export const OrgHome: React.FC = () => {
   const handleToggleIntake = async (checked: boolean) => {
     if (!capacity) return;
     try {
-      const updated = await api.post<CapacitySnapshot>('/api/capacity', { is_open: checked });
+      const updated = await api.post<CapacitySnapshot>('/org/capacity', { is_open: checked });
       setCapacity(updated);
       addToast(checked ? 'Intake active: Accepting donation offers' : 'Intake paused: No new offers will arrive', 'info');
     } catch {

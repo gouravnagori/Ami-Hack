@@ -156,6 +156,7 @@ async def admin_live(
 # ---- Simulate donation ----
 
 @router.post("/simulate/donation", summary="Fire test donations")
+@router.post("/simulate", summary="Fire test donations (alias)")
 async def simulate_donation(
     req: SimulateDonationRequest,
     current_user=Depends(require_role(Role.ADMIN)),

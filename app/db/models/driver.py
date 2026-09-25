@@ -28,6 +28,8 @@ class Driver(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         default=VehicleType.SCOOTER,
         nullable=False,
     )
+    vehicle_number: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    operating_area: Mapped[str | None] = mapped_column(String(255), nullable=True)
     capacity_portions: Mapped[int] = mapped_column(Integer, default=50, nullable=False)
     has_cold_box: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     status: Mapped[DriverStatus] = mapped_column(

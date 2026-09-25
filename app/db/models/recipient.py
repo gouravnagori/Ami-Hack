@@ -29,6 +29,11 @@ class RecipientOrg(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     lng: Mapped[float] = mapped_column(Float, nullable=False, index=True)
     fssai_reg_no: Mapped[str | None] = mapped_column(String(50), nullable=True)
     verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    contact_person: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    contact_phone: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    max_capacity_portions: Mapped[int] = mapped_column(Integer, default=150, nullable=False)
+    food_restrictions: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    receiving_hours: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     # Dietary & storage constraints
     accepts_diets: Mapped[list[str]] = mapped_column(

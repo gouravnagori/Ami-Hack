@@ -32,6 +32,10 @@ class Donor(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     default_pickup_window: Mapped[dict | None] = mapped_column(
         JSON, nullable=True
     )  # e.g. {"start": "21:00", "end": "23:00"}
+    pickup_address: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    food_category: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    contact_person: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    operating_hours: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="donor_profile")

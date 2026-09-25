@@ -45,7 +45,7 @@ export const offlineQueue = {
 
     for (const action of queue) {
       try {
-        await api.post(`/api/routes/${action.routeId}/stops/${action.stopId}/done`, {
+        await api.post(`/stops/${action.stopId}/complete`, {
           otp: action.otp,
         });
         synced++;

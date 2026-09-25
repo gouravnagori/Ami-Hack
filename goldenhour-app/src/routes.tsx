@@ -8,6 +8,7 @@ import { ToastContainer } from './components/ui/Toast';
 // Pages
 import { LandingPage } from './features/landing/LandingPage';
 import { AuthPage } from './features/auth/AuthPage';
+import { ProfilePage } from './features/auth/ProfilePage';
 
 // Donor
 import { DonorLayout } from './features/donor/DonorLayout';
@@ -31,6 +32,9 @@ import { DoneScreen } from './features/driver/pages/DoneScreen';
 
 // Ops
 import { OpsConsole } from './features/ops/OpsConsole';
+
+// Auth Guard
+import { AuthGuard } from './components/auth/AuthGuard';
 
 // Root shell component that wraps all routes with global Header and Toasts
 const RootShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -61,10 +65,20 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: '/profile',
+    element: (
+      <RootShell>
+        <ProfilePage />
+      </RootShell>
+    ),
+  },
+  {
     path: '/donor',
     element: (
       <RootShell>
-        <DonorLayout />
+        <AuthGuard requiredRole="donor">
+          <DonorLayout />
+        </AuthGuard>
       </RootShell>
     ),
     children: [
@@ -78,7 +92,9 @@ export const router = createBrowserRouter([
     path: '/org',
     element: (
       <RootShell>
-        <OrgLayout />
+        <AuthGuard requiredRole="recipient">
+          <OrgLayout />
+        </AuthGuard>
       </RootShell>
     ),
     children: [
@@ -91,7 +107,9 @@ export const router = createBrowserRouter([
     path: '/driver',
     element: (
       <RootShell>
-        <DriverLayout />
+        <AuthGuard requiredRole="driver">
+          <DriverLayout />
+        </AuthGuard>
       </RootShell>
     ),
     children: [
@@ -105,7 +123,9 @@ export const router = createBrowserRouter([
     path: '/ops',
     element: (
       <RootShell>
-        <OpsConsole />
+        <AuthGuard requiredRole="admin">
+          <OpsConsole />
+        </AuthGuard>
       </RootShell>
     ),
   },
