@@ -12,10 +12,12 @@ export const AuthPage: React.FC = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const initialRole = (searchParams.get('role') as Role) || 'donor';
+  const initialMode = searchParams.get('mode') === 'register' ? 'register' : 'login';
 
-  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [mode, setMode] = useState<'login' | 'register'>(initialMode);
   const [role, setRole] = useState<Role>(initialRole);
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const { setSession } = useSessionStore();
@@ -28,31 +30,41 @@ export const AuthPage: React.FC = () => {
     const roleParam = searchParams.get('role') as Role | null;
     if (roleParam && fromGuard) {
       // Auto-login with the hinted role
-      handleLogin(roleParam);
+      handleLogin(roleParam, true);
     }
     // Only run on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleLogin = async (selectedRole: Role) => {
+  const handleLogin = async (selectedRole: Role, isExplicitDemo: boolean = false) => {
     setLoading(true);
     try {
-      // 1. Authenticate via /auth/demo
-      const tokens = await api.post<{
+      let tokens: {
         access_token: string;
         refresh_token: string;
         token_type: string;
         expires_in: number;
         user_id: string;
         role: Role;
-      }>('/auth/demo', {
-        role: selectedRole,
-      });
+      };
+
+      if (!isExplicitDemo && email && password) {
+        // Authenticate with user's registered credentials
+        tokens = await api.post('/auth/login', {
+          phone_or_email: email,
+          password: password,
+        });
+      } else {
+        // Authenticate via /auth/demo
+        tokens = await api.post('/auth/demo', {
+          role: selectedRole,
+        });
+      }
 
       // Set tokens in session store so subsequent requests include Authorization header
       useSessionStore.getState().setTokens(tokens.access_token, tokens.refresh_token);
 
-      // 2. Fetch authenticated user profile
+      // Fetch authenticated user profile
       const user = await api.get<User>('/auth/me');
 
       setSession(user, {
@@ -65,9 +77,9 @@ export const AuthPage: React.FC = () => {
       const from = (location.state as { from?: string } | null)?.from;
       if (from) {
         navigate(from, { replace: true });
-      } else if (selectedRole === 'donor') navigate('/donor');
-      else if (selectedRole === 'recipient') navigate('/org');
-      else if (selectedRole === 'driver') navigate('/driver');
+      } else if (user.role === 'donor') navigate('/donor');
+      else if (user.role === 'recipient') navigate('/org');
+      else if (user.role === 'driver') navigate('/driver');
       else navigate('/ops');
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : 'Sign in failed';
@@ -177,7 +189,7 @@ export const AuthPage: React.FC = () => {
         {mode === 'login' ? (
           <>
             {/* Email or Phone field */}
-            <div style={{ marginBottom: '20px' }}>
+            <div style={{ marginBottom: '14px' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--deep)', marginBottom: '6px' }}>
                 Email or Registered Phone
               </label>
@@ -185,7 +197,35 @@ export const AuthPage: React.FC = () => {
                 type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="e.g. contact@spiceroutejaipur.com"
+                placeholder="e.g. sajalgoyal2007@gmail.com"
+                style={{
+                  width: '100%',
+                  padding: '12px 14px',
+                  borderRadius: 'var(--r-card-sm)',
+                  border: '1px solid var(--line)',
+                  background: 'var(--paper)',
+                  fontSize: '0.95rem',
+                  color: 'var(--ink)',
+                  outline: 'none',
+                }}
+              />
+            </div>
+
+            {/* Password field */}
+            <div style={{ marginBottom: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--deep)' }}>
+                  Password
+                </label>
+                <span style={{ fontSize: '0.74rem', color: 'var(--muted)' }}>
+                  Optional for instant demo
+                </span>
+              </div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password to sign into your account"
                 style={{
                   width: '100%',
                   padding: '12px 14px',
@@ -208,7 +248,7 @@ export const AuthPage: React.FC = () => {
               onClick={() => handleLogin(role)}
               disabled={loading}
             >
-              {loading ? 'Entering...' : `Enter as ${role.toUpperCase()}`}
+              {loading ? 'Entering...' : (password ? `Sign In as ${role.toUpperCase()}` : `Enter as ${role.toUpperCase()} (Demo)`)}
             </Button>
             
             <div style={{ marginTop: '16px', textAlign: 'center' }}>
@@ -231,7 +271,7 @@ export const AuthPage: React.FC = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <button
               type="button"
-              onClick={() => handleLogin('donor')}
+              onClick={() => handleLogin('donor', true)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -250,7 +290,7 @@ export const AuthPage: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => handleLogin('recipient')}
+              onClick={() => handleLogin('recipient', true)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -269,7 +309,7 @@ export const AuthPage: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => handleLogin('driver')}
+              onClick={() => handleLogin('driver', true)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -288,7 +328,7 @@ export const AuthPage: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => handleLogin('admin')}
+              onClick={() => handleLogin('admin', true)}
               style={{
                 display: 'flex',
                 alignItems: 'center',

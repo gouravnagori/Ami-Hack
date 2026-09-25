@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useSessionStore } from '../../store/session';
 import { useUiStore } from '../../store/ui';
 import { api } from '../../lib/api';

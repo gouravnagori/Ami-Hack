@@ -1,13 +1,16 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useSessionStore } from '../../store/session';
 
 export const DonorLayout: React.FC = () => {
   const location = useLocation();
+  const { user } = useSessionStore();
 
   const navItems = [
     { path: '/donor', label: 'Dashboard', icon: '📊' },
     { path: '/donor/new', label: 'Quick Post', icon: '➕' },
     { path: '/donor/impact', label: 'Impact & Tax', icon: '🌱' },
+    { path: '/profile', label: 'Profile', icon: '👤' },
   ];
 
   return (
@@ -24,8 +27,12 @@ export const DonorLayout: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '20px' }}>🍲</span>
             <div>
-              <strong style={{ fontSize: '1rem', color: 'var(--deep)' }}>Spice Route Kitchen</strong>
-              <div style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>C-Scheme, Ashok Nagar, Jaipur • Pure Veg Donor</div>
+              <strong style={{ fontSize: '1rem', color: 'var(--deep)' }}>
+                {user?.profile?.org_name || user?.name || 'Spice Route Kitchen'}
+              </strong>
+              <div style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>
+                {user?.profile?.pickup_address || user?.city || 'Jaipur'} • {user?.profile?.food_category || 'Donor Hub'}
+              </div>
             </div>
           </div>
 

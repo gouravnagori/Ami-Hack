@@ -1,13 +1,16 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useSessionStore } from '../../store/session';
 
 export const DriverLayout: React.FC = () => {
   const location = useLocation();
+  const { user } = useSessionStore();
 
   const navItems = [
     { path: '/driver', label: 'Shift Home', icon: '🛵' },
     { path: '/driver/active', label: 'Active Route', icon: '📍' },
     { path: '/driver/offers', label: 'Offers', icon: '⚡' },
+    { path: '/profile', label: 'Profile', icon: '👤' },
   ];
 
   return (
@@ -34,8 +37,10 @@ export const DriverLayout: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '18px' }}>🛵</span>
           <div>
-            <strong style={{ fontSize: '0.95rem' }}>Rajesh Kumar</strong>
-            <div style={{ fontSize: '0.72rem', color: 'var(--green)' }}>E-Rickshaw • RJ-14-ER-9821</div>
+            <strong style={{ fontSize: '0.95rem' }}>{user?.name || 'Rajesh Kumar'}</strong>
+            <div style={{ fontSize: '0.72rem', color: 'var(--green)' }}>
+              {user?.profile?.vehicle_type || 'Vehicle'} • {user?.profile?.vehicle_number || user?.profile?.operating_area || 'Jaipur Active'}
+            </div>
           </div>
         </div>
 

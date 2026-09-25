@@ -91,6 +91,7 @@ export const Header: React.FC = () => {
                 <Link to="/org" className={`${styles.navLink} ${location.pathname.startsWith('/org') ? styles.active : ''}`}>Shelter</Link>
                 <Link to="/driver" className={`${styles.navLink} ${location.pathname.startsWith('/driver') ? styles.active : ''}`}>Driver</Link>
                 <Link to="/ops" className={`${styles.navLink} ${location.pathname.startsWith('/ops') ? styles.active : ''}`}>Ops Console</Link>
+                <Link to="/profile" className={`${styles.navLink} ${location.pathname.startsWith('/profile') ? styles.active : ''}`}>Profile</Link>
               </>
             )}
           </nav>
@@ -168,14 +169,30 @@ export const Header: React.FC = () => {
                       <small>Realtime Jaipur Telemetry</small>
                     </div>
                   </Link>
+
+                  <div style={{ height: '1px', background: 'var(--line)', margin: '4px 0' }} />
+
+                  <Link
+                    to="/profile"
+                    className={styles.rolesMenuItem}
+                    onClick={() => setRolesMenuOpen(false)}
+                  >
+                    <span>👤</span>
+                    <div>
+                      <strong>Account & Profile</strong>
+                      <small>View & edit user profile</small>
+                    </div>
+                  </Link>
                 </div>
               )}
             </div>
 
             {user ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Link to="/profile" className={styles.userBadge} style={{ textDecoration: 'none' }}>
-                  {user.name}
+                <Link to="/profile" className={styles.profileBadgeBtn} title="My Profile & Settings">
+                  <span className={styles.profileAvatarIcon}>👤</span>
+                  <span>{user.name}</span>
+                  <span className={styles.profileRoleTag}>{user.role}</span>
                 </Link>
                 <Button
                   variant="outline"
@@ -189,14 +206,23 @@ export const Header: React.FC = () => {
                 </Button>
               </div>
             ) : (
-              <Button
-                variant="primary"
-                size="sm"
-                arrow
-                onClick={() => navigate('/auth')}
-              >
-                Sign In
-              </Button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Link
+                  to="/profile"
+                  className={styles.rolesDropdownTrigger}
+                  style={{ textDecoration: 'none' }}
+                >
+                  <span>👤 Profile</span>
+                </Link>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  arrow
+                  onClick={() => navigate('/auth')}
+                >
+                  Sign In
+                </Button>
+              </div>
             )}
 
             {/* Hamburger Button for mobile */}
@@ -221,6 +247,7 @@ export const Header: React.FC = () => {
               <Link to="/org" onClick={() => setMobileMenuOpen(false)}>Shelter App</Link>
               <Link to="/driver" onClick={() => setMobileMenuOpen(false)}>Driver App</Link>
               <Link to="/ops" onClick={() => setMobileMenuOpen(false)}>Ops Console</Link>
+              <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>👤 My Profile</Link>
               <div className={styles.mobileDivider} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0' }}>
                 <span>Language</span>

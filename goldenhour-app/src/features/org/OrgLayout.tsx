@@ -1,13 +1,16 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useSessionStore } from '../../store/session';
 
 export const OrgLayout: React.FC = () => {
   const location = useLocation();
+  const { user } = useSessionStore();
 
   const navItems = [
     { path: '/org', label: 'Intake Dashboard', icon: '🏠' },
     { path: '/org/capacity', label: 'Capacity Manager', icon: '⚙️' },
     { path: '/org/history', label: 'Receipts & History', icon: '📋' },
+    { path: '/profile', label: 'Profile', icon: '👤' },
   ];
 
   return (
@@ -24,8 +27,12 @@ export const OrgLayout: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '20px' }}>🏠</span>
             <div>
-              <strong style={{ fontSize: '1rem', color: 'var(--deep)' }}>Asha Shelter Foundation</strong>
-              <div style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>Sector 4, Malviya Nagar, Jaipur • Capacity Hub #ORG-14</div>
+              <strong style={{ fontSize: '1rem', color: 'var(--deep)' }}>
+                {user?.profile?.name || user?.name || 'Asha Shelter Foundation'}
+              </strong>
+              <div style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>
+                {user?.profile?.address || user?.city || 'Jaipur'} • Capacity Hub
+              </div>
             </div>
           </div>
 
